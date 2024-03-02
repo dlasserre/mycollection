@@ -10,11 +10,11 @@ class AttachmentType extends AbstractEnumType
 
     public static function getEnumsClass(): string
     {
-        return self::NAME;
+        return Attachment::class;
     }
 
     public function getName(): string
     {
-        return Attachment::class;
+        return self::NAME;
     }
 }

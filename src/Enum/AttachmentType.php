@@ -2,28 +2,14 @@
 
 namespace App\Enum;
 
-enum AttachmentType
+enum AttachmentType: string
 {
     use BaseEnumTrait;
 
-    case IMAGE;
-
-    case FILE;
-
-    case CERTIFICATE;
-
-    case INVOICE;
-
-    case OTHER;
-
-    public function getTypeName(): string
-    {
-        return match ($this) {
-            self::IMAGE => 'Image',
-            self::FILE => 'File',
-            self::CERTIFICATE => 'Certificate',
-            self::INVOICE => 'Invoice',
-            default => 'other',
-        };
-    }
+    case IMAGE = 'image';
+    case PP = 'pp';
+    case FILE = 'file';
+    case CERTIFICATE = 'certificate';
+    case INVOICE = 'invoice';
+    case OTHER = 'other';
 }

@@ -72,6 +72,9 @@ class Item
     #[ORM\JoinColumn(nullable: true)]
     public ?Price $price = null;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    public bool $public = false;
+
     public function __construct()
     {
         $this->collections = new ArrayCollection();
@@ -82,5 +85,10 @@ class Item
     public function isBuyable(): bool
     {
         return $this->price instanceof Price;
+    }
+
+    public function isPublic(): bool
+    {
+        return $this->public;
     }
 }

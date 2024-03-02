@@ -19,6 +19,26 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+            - '../src/Provider/'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    
+    App\Provider\CollectionProvider:
+        arguments:
+            - '@security.helper'
+            - '@doctrine'
+            - !tagged api_platform.doctrine.orm.query_extension.collection
+            - '@api_platform.iri_converter'
+        tags: [ 'api_platform.state_provider' ]
+        
+    App\Processor\CollectionProcessor:
+        arguments:
+            - '@security.helper'
+            - '@doctrine'
+            - '@api_platform.iri_converter'
+        tags: [ 'api_platform.state_processor' ]
+        
+    App\EventListener\ExceptionListener:
+        tags:
+            - { name: 'kernel.event_listener', event: 'kernel.exception' }

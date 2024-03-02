@@ -16,6 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
@@ -36,7 +37,6 @@ use Symfony\Component\Validator\Constraints as Assert;
             security: 'is_granted("ROLE_ADMIN")'
         )
     ],
-    mercure: true
 )]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -44,49 +44,48 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     use DateTrait;
     use IdTrait;
 
-    #[Groups(['user:output:USER', 'user:input:USER'])]
+    #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Collection::class)]
     public iterable $collections;
 
-    #[Groups(['user:output:USER', 'user:input:USER'])]
+    #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\OneToMany(mappedBy: 'createdBy', targetEntity: Item::class)]
     public iterable $items;
 
-    #[Groups(['user:output:USER', 'user:input:USER'])]
+    #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\Column(type: 'gender')]
-    #[Assert\NotBlank]
     public Gender $gender;
 
-    #[Groups(['user:output:USER', 'user:input:USER'])]
+    #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\Column(type: 'string')]
-    #[Assert\NotBlank]
     public string $firstname;
 
-    #[Groups(['user:output:USER', 'user:input:USER'])]
+    #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\Column(type: 'string')]
-    #[Assert\NotBlank]
     public string $lastname;
 
-    #[Groups(['user:output:USER', 'user:input:USER'])]
+    #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\Column(type: 'string')]
-    #[Assert\NotBlank]
     public string $email;
 
-    #[Groups(['user:input:USER'])]
+    #[Groups(['user:input:ROLE_USER'])]
     public ?string $plainPassword = null;
 
-    #[Groups(['user:input:USER'])]
+    #[Groups(['user:input:ROLE_USER'])]
     #[ORM\Column(type: 'string')]
     public string $password;
 
-    #[Groups(['user:output:USER', 'user:input:USER'])]
+    #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\Column(type: 'datetime', nullable: true)]
-    #[Assert\DateTime]
     public ?\DateTime $birthdayDate = null;
 
-    #[Groups(['user:output:USER', 'user:input:ROLE_SUPER_ADMIN'])]
+    #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_SUPER_ADMIN'])]
     #[ORM\Column(type: 'json', nullable: false)]
     public array $roles;
+
+    #[Groups(['user:output:ROLE__USER', 'user:input:ROLE_USER'])]
+    #[ORM\OneToOne(targetEntity: Image::class)]
+    public ?Image $profileImage = null;
 
     public function __construct()
     {
@@ -126,5 +125,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getPassword(): ?string
     {
         return $this->password;
+    }
+
+    public function hasCollection(Collection $collection): bool
+    {
+        return $this->collections->contains($collection);
+    }
+
+    public function isAdmin(): bool
+    {
+        return in_array(Role::ADMIN->getRoleName(), $this->roles);
+    }
+
+    #[SerializedName('imageProfilePath')]
+    public function getImageProfilePath(): string
+    {
+        return '/public/uploads/images/'.$this->profileImage->filePath;
     }
 }

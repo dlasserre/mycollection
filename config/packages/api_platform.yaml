@@ -1,8 +1,6 @@
 api_platform:
     title: My Collection
     version: 1.0.0
-    # Mercure integration, remove if unwanted
-    mercure: ~
     formats:
         jsonld: [ 'application/ld+json' ]
     docs_formats:

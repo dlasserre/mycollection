@@ -8,12 +8,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 trait DateTrait
 {
-    #[Assert\DateTime()]
-    #[Assert\NotBlank]
     #[ORM\Column(type: 'datetime')]
     private \DateTime $createdAt;
 
-    #[Assert\DateTime()]
     #[ORM\Column(type: 'datetime', nullable: true)]
     private \DateTime $updateAt;
 
@@ -27,5 +24,10 @@ trait DateTrait
     public function getUpdateAt(): \DateTime
     {
         return $this->updateAt;
+    }
+
+    public function setUpdateAt(): void
+    {
+        $this->updateAt = new \DateTime();
     }
 }
