@@ -2,8 +2,8 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -12,7 +12,6 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Processor\CollectionProcessor;
-use App\Provider\CollectionItemProvider;
 use App\Provider\CollectionProvider;
 use App\Repository\CollectionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -23,7 +22,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     operations: [
         new GetCollection(
-            security: 'is_granted("ROLE_ADMIN")',
+            security: 'is_granted("ROLE_USER")',
             provider: CollectionProvider::class
         ),
         new Get(
@@ -72,21 +71,24 @@ class Collection
         'collection:input:USER',
     ])]
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: Collection::class)]
-    public iterable $children;
+    public \Doctrine\Common\Collections\Collection $children;
 
     #[Groups([
         'collection:output:USER',
         'collection:input:USER',
     ])]
     #[ORM\ManyToMany(targetEntity: Item::class, inversedBy: 'collections')]
-    public iterable $items;
+    public \Doctrine\Common\Collections\Collection $items;
 
     #[Groups([
         'collection:output:USER',
         'collection:input:USER',
     ])]
     #[ORM\OneToMany(mappedBy: 'collection', targetEntity: Attachment::class)]
-    public iterable $attachments;
+    public \Doctrine\Common\Collections\Collection $attachments;
+
+    #[ORM\OneToMany(mappedBy: 'collection', targetEntity: Resource::class)]
+    public \Doctrine\Common\Collections\Collection $resources;
 
     #[Groups([
         'user:output:USER',
@@ -121,5 +123,6 @@ class Collection
         $this->attachments = new ArrayCollection();
         $this->createdAt =  new \DateTime();
         $this->children = new ArrayCollection();
+        $this->resources = new ArrayCollection();
     }
 }

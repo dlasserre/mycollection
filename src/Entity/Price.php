@@ -5,29 +5,37 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
 
-#[ApiResource(mercure: true)]
+#[ApiResource()]
 #[ORM\Entity]
 class Price
 {
     use IdTrait;
     use DateTrait;
 
+    #[ORM\ManyToOne(targetEntity: Item::class, inversedBy: 'prices')]
+    public Item $item;
+
     #[Groups([
-        'user:output:USER',
-        'item:output:USER',
-        'item:input:USER',
+        'item:output:ROLE_USER',
+        'collection:input:ROLE_USER',
+        'collection:output:ROLE_USER',
+        'item:input:ROLE_USER',
     ])]
-    #[ORM\Column(type: 'bigint')]
-    #[Assert\NotBlank()]
+    #[ORM\Column(type: 'integer')]
     public int $price;
 
     #[Groups([
-        'user:output:USER',
-        'item:output:USER',
-        'item:input:USER',
+        'item:output:ROLE_USER',
+        'collection:input:ROLE_USER',
+        'collection:output:ROLE_USER',
+        'item:input:ROLE_USER',
     ])]
-    #[ORM\Column(type: 'bigint', options: ['default' => 0])]
+    #[ORM\Column(type: 'integer', nullable: true)]
     public ?int $crossedPrice = null;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+    }
 }

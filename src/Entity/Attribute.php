@@ -6,7 +6,6 @@ use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(mercure: true)]
 #[ORM\Entity()]
@@ -15,7 +14,7 @@ class Attribute
     use DateTrait;
     use IdTrait;
 
-    #[ORM\OneToMany(mappedBy: 'attributes', targetEntity: Item::class)]
+    #[ORM\ManyToMany(targetEntity: Item::class, mappedBy: 'attributes')]
     public iterable $items;
 
     #[Groups([
@@ -25,7 +24,6 @@ class Attribute
         'item:output:USER',
     ])]
     #[ORM\Column(type: 'string')]
-    #[Assert\NotBlank()]
     public string $name;
 
     #[Groups([
@@ -35,7 +33,6 @@ class Attribute
         'item:output:USER',
     ])]
     #[ORM\Column(type: 'string')]
-    #[Assert\NotBlank]
     public string $value;
 
     #[Groups([

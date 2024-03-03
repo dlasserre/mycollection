@@ -17,7 +17,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
-use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     operations: [
@@ -70,8 +69,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(['user:input:ROLE_USER'])]
     public ?string $plainPassword = null;
-
-    #[Groups(['user:input:ROLE_USER'])]
+    
     #[ORM\Column(type: 'string')]
     public string $password;
 
@@ -85,6 +83,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(['user:output:ROLE__USER', 'user:input:ROLE_USER'])]
     #[ORM\OneToOne(targetEntity: Image::class)]
+    #[ORM\JoinColumn(nullable: true)]
     public ?Image $profileImage = null;
 
     public function __construct()
@@ -138,8 +137,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     #[SerializedName('imageProfilePath')]
-    public function getImageProfilePath(): string
+    public function getImageProfilePath(): ?string
     {
-        return '/public/uploads/images/'.$this->profileImage->filePath;
+        if ($this->profileImage instanceof Image) {
+            return '/public/uploads/images/'.$this->profileImage->filePath;
+        }
+        return null;
     }
 }

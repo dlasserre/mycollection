@@ -5,7 +5,6 @@ namespace App\Processor;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\Entity\Collection;
 use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectRepository;
@@ -24,14 +23,28 @@ abstract class AbstractProcessor implements ProcessorInterface
     ) {
     }
 
-    abstract public function post(mixed $data, Operation $operation, array $uriVariables = [], array $context = []);
-    abstract public function delete(mixed $data, array $context = []);
-    abstract public function patch(mixed $data, Operation $operation, array $uriVariables = [], array $context = []);
+    public function post(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
+    {
+        $this->save($data);
+        return $data;
+    }
+
+    public function delete(mixed $data, array $context = []): mixed
+    {
+        $this->remove($data);
+        return $data;
+    }
+
+    public function patch(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
+    {
+        $this->save($data);
+        return $data;
+    }
 
     /**
      * @throws \Exception
      */
-    public function process($data, Operation $operation, array $uriVariables = [], array $context = []): ?Collection
+    public function process($data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         return match ($method = $this->getRequestMethod()) {
             Request::METHOD_DELETE => $this->delete($data, $context),

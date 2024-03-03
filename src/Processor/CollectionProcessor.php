@@ -7,8 +7,8 @@ use ApiPlatform\Metadata\Operation;
 use App\Entity\Collection;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class CollectionProcessor extends AbstractProcessor
 {
@@ -30,14 +30,10 @@ class CollectionProcessor extends AbstractProcessor
      */
     public function post(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Collection
     {
+        if ($data->parent instanceof Collection and $data->parent->user !== $this->getUser()) {
+            throw new UnauthorizedHttpException('', 'Your not allowed to use this parent collection');
+        }
         $data->user = $this->getUser();
-        $this->save($data);
-        return $data;
-    }
-
-    public function patch($data, Operation $operation, array $uriVariables = [], array $context = []): Collection
-    {
-        $data->setUpdateAt();
         $this->save($data);
         return $data;
     }
