@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
 
 trait DateTrait
 {
@@ -12,7 +11,7 @@ trait DateTrait
     private \DateTime $createdAt;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private \DateTime $updateAt;
+    private ?\DateTime $updateAt = null;
 
     #[Groups(['always'])]
     public function getCreatedAt(): \DateTime
@@ -21,7 +20,7 @@ trait DateTrait
     }
 
     #[Groups(['always'])]
-    public function getUpdateAt(): \DateTime
+    public function getUpdateAt(): ?\DateTime
     {
         return $this->updateAt;
     }

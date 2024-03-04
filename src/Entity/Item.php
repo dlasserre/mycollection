@@ -44,7 +44,6 @@ class Item
     #[Groups([
         'item:output:ROLE_USER',
         'collection:input:ROLE_USER',
-        'collection:output:ROLE_USER',
         'item:input:ROLE_USER',
     ])]
     #[ORM\ManyToMany(targetEntity: Collection::class, mappedBy: 'items')]
@@ -120,14 +119,14 @@ class Item
 
     public function isBuyable(): bool
     {
-        return $this->price instanceof Price;
+        return $this->prices->count();
     }
 
     public function isPublic(): bool
     {
         return $this->public;
     }
-    
+
     public function addPrice(Price $price): Item
     {
         if (!$this->prices->contains($price)) {

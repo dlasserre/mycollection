@@ -15,6 +15,7 @@ use App\Processor\CollectionProcessor;
 use App\Provider\CollectionProvider;
 use App\Repository\CollectionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -40,7 +41,9 @@ use Symfony\Component\Validator\Constraints as Assert;
             security: 'is_granted("ROLE_ADMIN") or is_granted("ROLE_USER") and user.hasCollection(object)',
             processor: CollectionProcessor::class
         )
-    ]
+    ],
+    normalizationContext: ['groups' => ['collection']],
+    denormalizationContext: ['groups' => ['collection']]
 )]
 #[ORM\Entity(repositoryClass: CollectionRepository::class)]
 #[ApiFilter(BooleanFilter::class, properties: [
@@ -60,29 +63,36 @@ class Collection
      *  https://github.com/judev/php-intervaltree
      * */
     #[Groups([
-        'collection:output:USER',
-        'collection:input:USER',
+        'collection:output:ROLE_USER',
+        'collection:input:ROLE_USER',
     ])]
     #[ORM\ManyToOne(targetEntity: Collection::class, inversedBy: 'children')]
     public ?Collection $parent = null;
 
     #[Groups([
-        'collection:output:USER',
-        'collection:input:USER',
+        'collection:output:ROLE_USER',
+        'collection:input:ROLE_USER',
     ])]
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: Collection::class)]
     public \Doctrine\Common\Collections\Collection $children;
 
     #[Groups([
-        'collection:output:USER',
-        'collection:input:USER',
+        'collection:output:ROLE_USER',
+        'collection:input:ROLE_USER',
+    ])]
+    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'collections')]
+    public Category $category;
+
+    #[Groups([
+        'collection:output:ROLE_USER',
+        'collection:input:ROLE_USER',
     ])]
     #[ORM\ManyToMany(targetEntity: Item::class, inversedBy: 'collections')]
     public \Doctrine\Common\Collections\Collection $items;
 
     #[Groups([
-        'collection:output:USER',
-        'collection:input:USER',
+        'collection:output:ROLE_USER',
+        'collection:input:ROLE_USER',
     ])]
     #[ORM\OneToMany(mappedBy: 'collection', targetEntity: Attachment::class)]
     public \Doctrine\Common\Collections\Collection $attachments;
@@ -91,18 +101,19 @@ class Collection
     public \Doctrine\Common\Collections\Collection $resources;
 
     #[Groups([
-        'user:output:USER',
-        'item:output:USER',
-        'collection:output:USER',
-        'collection:input:USER',
+        'user:output:ROLE_USER',
+        'item:output:ROLE_USER',
+        'collection:output:ROLE_USER',
+        'collection:input:ROLE_USER',
+        'category:output:ROLE_USER',
     ])]
     #[ORM\Column(type: 'string')]
     #[Assert\NotBlank()]
     public string $name;
 
     #[Groups([
-        'collection:output:USER',
-        'collection:input:USER',
+        'collection:output:ROLE_USER',
+        'collection:input:ROLE_USER',
     ])]
     #[ORM\Column(type: 'text', nullable: true)]
     public ?string $description = null;
@@ -110,7 +121,6 @@ class Collection
     #[Orm\ManyToOne(targetEntity: User::class, inversedBy: 'collections')]
     public User $user;
 
-    #[Assert\NotNull()]
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     public bool $published;
 
@@ -124,5 +134,16 @@ class Collection
         $this->createdAt =  new \DateTime();
         $this->children = new ArrayCollection();
         $this->resources = new ArrayCollection();
+    }
+
+    #[Groups([
+        'collection:output:ROLE_USER',
+        'collection:input:ROLE_USER',
+    ])]
+    public function getItems(): \Doctrine\Common\Collections\Collection
+    {
+        $criteria = Criteria::create()
+            ->andWhere(Criteria::expr()->eq('public', 1));
+        return $this->items->matching($criteria);
     }
 }

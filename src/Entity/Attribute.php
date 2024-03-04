@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource(mercure: true)]
+#[ApiResource()]
 #[ORM\Entity()]
 class Attribute
 {

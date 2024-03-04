@@ -51,6 +51,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'createdBy', targetEntity: Item::class)]
     public iterable $items;
 
+    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'users')]
+    public iterable $privateCategories;
+
     #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\Column(type: 'gender')]
     public Gender $gender;
@@ -69,7 +72,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(['user:input:ROLE_USER'])]
     public ?string $plainPassword = null;
-    
+
     #[ORM\Column(type: 'string')]
     public string $password;
 
