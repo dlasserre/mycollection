@@ -9,9 +9,14 @@ abstract class AbstractEnumType extends Type
 {
     abstract public static function getEnumsClass(): string;
 
-    public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
+    protected function getColumnType(): string
     {
         return 'TEXT';
+    }
+
+    public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
+    {
+        return $this->getColumnType();
     }
 
     public function convertToDatabaseValue($value, AbstractPlatform $platform)

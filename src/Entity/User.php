@@ -54,6 +54,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'users')]
     public iterable $privateCategories;
 
+    #[ORM\OneToMany(mappedBy: 'createdBy', targetEntity: Attribute::class)]
+    public iterable $privateAttributes;
+
     #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\Column(type: 'gender')]
     public Gender $gender;

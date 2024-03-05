@@ -21,7 +21,7 @@ class CollectionRepository extends AbstractRepository
         }
         $query->where($query->expr()->orX('c.published = true', 'c.published = false and c.user = :user'))
             ->setParameter(':user', $user);
-        
+
         return $query;
     }
 }

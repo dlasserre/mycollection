@@ -14,41 +14,43 @@ class Attribute
     use DateTrait;
     use IdTrait;
 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'privateAttributes')]
+    public User $createdBy;
+
     #[ORM\ManyToMany(targetEntity: Item::class, mappedBy: 'attributes')]
     public iterable $items;
 
     #[Groups([
-        'attribute:output:USER',
-        'attribute:input:USER',
-        'collection:output:USER',
-        'item:output:USER',
+        'attribute:output:ROLE_USER',
+        'collection:output:ROLE_USER',
+        'item:output:ROLE_USER',
+    ])]
+    #[ORM\OneToMany(mappedBy: 'attribute', targetEntity: AttributeValue::class)]
+    public iterable $attributeValue;
+
+    #[Groups([
+        'attribute:output:ROLE_USER',
+        'attribute:input:ROLE_USER',
+        'collection:output:ROLE_USER',
+        'item:output:ROLE_USER',
     ])]
     #[ORM\Column(type: 'string')]
     public string $name;
 
     #[Groups([
-        'attribute:output:USER',
-        'attribute:input:USER',
-        'collection:output:USER',
-        'item:output:USER',
-    ])]
-    #[ORM\Column(type: 'string')]
-    public string $value;
-
-    #[Groups([
-        'attribute:output:USER',
-        'attribute:input:USER',
-        'collection:output:USER',
-        'item:output:USER',
+        'attribute:output:ROLE_USER',
+        'attribute:input:ROLE_USER',
+        'collection:output:ROLE_USER',
+        'item:output:ROLE_USER',
     ])]
     #[ORM\Column(type: 'text', nullable: true)]
     public string $description = '';
 
     #[Groups([
-        'attribute:output:USER',
-        'attribute:input:USER',
-        'collection:output:USER',
-        'item:output:USER',
+        'attribute:output:ROLE_USER',
+        'attribute:input:ROLE_USER',
+        'collection:output:ROLE_USER',
+        'item:output:ROLE_USER',
     ])]
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     public bool $public;

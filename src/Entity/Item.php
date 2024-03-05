@@ -59,10 +59,10 @@ class Item
     public ?iterable $attributes = null;
 
     #[Groups([
-        'item:output:USER',
-        'collection:input:USER',
-        'collection:output:USER',
-        'item:input:USER',
+        'item:output:ROLE_USER',
+        'collection:input:ROLE_USER',
+        'collection:output:ROLE_USER',
+        'item:input:ROLE_USER',
     ])]
     #[ORM\OneToMany(mappedBy: 'item', targetEntity: Attachment::class)]
     public ?iterable $attachments = null;
@@ -98,7 +98,6 @@ class Item
     public string $description;
 
     #[Groups([
-        'collection:input:ROLE_USER',
         'collection:output:ROLE_USER',
     ])]
     #[ORM\OneToMany(mappedBy: 'item', targetEntity: Price::class, cascade: ['persist', 'remove'])]

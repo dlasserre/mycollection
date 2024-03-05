@@ -2,7 +2,6 @@
 
 namespace App\Serializer;
 
-use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use App\Enum\Role;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -37,26 +36,20 @@ final readonly class GenericContextBuilder implements SerializerContextBuilderIn
     public function getGroups(bool $normalization, array $context, array $roles): array
     {
         $norm = $normalization ? self::OUTPUT : self::INPUT;
-        $type = $context['operation'] instanceof GetCollection ? 'collection' : 'item';
+
         $groups = [
             ['always'],
-            [$norm],
-            [$type],
-            [$norm, $type]
+            [$norm]
         ];
         foreach ($context['groups'] as $group) {
-            array_push($groups, [$group], [$group, $norm], [$group, $type], [$group, $norm, $type]);
+            array_push($groups, [$group], [$group, $norm]);
             foreach ($roles as $role) {
                 array_push(
                     $groups,
                     [$role],
                     [$group, $role],
                     [$norm, $role],
-                    [$type, $role],
-                    [$norm, $type, $role],
                     [$group, $norm, $role],
-                    [$group, $type, $role],
-                    [$group, $norm, $type, $role]
                 );
             }
         }

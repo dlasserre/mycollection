@@ -4,6 +4,7 @@ doctrine:
         types:
             gender: App\DoctrineType\GenderType
             attachment_type: App\DoctrineType\AttachmentType
+            attribute_value_type: App\DoctrineType\AttributeValueType
 
         profiling_collect_backtrace: '%kernel.debug%'
     orm:

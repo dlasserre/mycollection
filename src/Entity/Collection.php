@@ -74,7 +74,7 @@ class Collection
         'collection:input:ROLE_USER',
     ])]
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: Collection::class)]
-    public \Doctrine\Common\Collections\Collection $children;
+    public iterable $children;
 
     #[Groups([
         'collection:output:ROLE_USER',
@@ -83,22 +83,18 @@ class Collection
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'collections')]
     public Category $category;
 
-    #[Groups([
-        'collection:output:ROLE_USER',
-        'collection:input:ROLE_USER',
-    ])]
     #[ORM\ManyToMany(targetEntity: Item::class, inversedBy: 'collections')]
-    public \Doctrine\Common\Collections\Collection $items;
+    private iterable $items;
 
     #[Groups([
         'collection:output:ROLE_USER',
         'collection:input:ROLE_USER',
     ])]
     #[ORM\OneToMany(mappedBy: 'collection', targetEntity: Attachment::class)]
-    public \Doctrine\Common\Collections\Collection $attachments;
+    public iterable $attachments;
 
     #[ORM\OneToMany(mappedBy: 'collection', targetEntity: Resource::class)]
-    public \Doctrine\Common\Collections\Collection $resources;
+    public iterable $resources;
 
     #[Groups([
         'user:output:ROLE_USER',
@@ -136,14 +132,41 @@ class Collection
         $this->resources = new ArrayCollection();
     }
 
+    public function addItem(Item $item): Collection
+    {
+        if(!$this->items->contains($item)) {
+            $this->items->add($item);
+        }
+        return $this;
+    }
+
     #[Groups([
-        'collection:output:ROLE_USER',
         'collection:input:ROLE_USER',
     ])]
-    public function getItems(): \Doctrine\Common\Collections\Collection
+    public function setItems(iterable $items): Collection
+    {
+        foreach ($items as $item) {
+            $this->addItem($item);
+        }
+        return $this;
+    }
+
+    #[Groups([
+        'collection:output:ROLE_USER',
+    ])]
+    public function getItems(): iterable
     {
         $criteria = Criteria::create()
-            ->andWhere(Criteria::expr()->eq('public', 1));
+            ->andWhere(Criteria::expr()->eq('public', true))
+            ->setMaxResults(10);
         return $this->items->matching($criteria);
+    }
+
+    #[Groups([
+        'collection:output:ROLE_USER',
+    ])]
+    public function getTotalItems(): int
+    {
+        return $this->items->count();
     }
 }
