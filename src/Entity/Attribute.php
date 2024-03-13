@@ -58,5 +58,6 @@ class Attribute
     public function __construct()
     {
         $this->items = new ArrayCollection();
+        $this->createdAt = new \DateTime();
     }
 }

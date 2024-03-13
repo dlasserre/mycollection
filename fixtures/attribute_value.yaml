@@ -1,0 +1,73 @@
+App\Entity\AttributeValue:
+    # Colors
+    attribute_color_value_1:
+        attribute: '@attribute_color'
+        type: 'string'
+        value: 'black'
+        public: true
+    attribute_color_value_2:
+        attribute: '@attribute_color'
+        type: 'string'
+        value: 'white'
+        public: true
+    attribute_color_value_3:
+        attribute: '@attribute_color'
+        type: 'string'
+        value: 'yellow'
+        public: true
+    attribute_color_value_4:
+        attribute: '@attribute_color'
+        type: 'string'
+        value: 'red'
+        public: true
+    attribute_color_value_5:
+        attribute: '@attribute_color'
+        type: 'string'
+        value: 'silver'
+        public: true
+    attribute_color_value_6:
+        attribute: '@attribute_color'
+        type: 'string'
+        value: 'gold'
+        public: true
+    attribute_color_value_7:
+        attribute: '@attribute_color'
+        type: 'string'
+        value: 'brown'
+        public: true
+    attribute_color_value_8:
+        attribute: '@attribute_color'
+        type: 'string'
+        value: 'blue'
+        public: true
+    attribute_color_value_9:
+        attribute: '@attribute_color'
+        type: 'string'
+        value: 'pink'
+        public: true
+    # states
+    attribute_state_value_10:
+        attribute: '@attribute_state'
+        type: 'string'
+        value: 'AB'
+        public: true
+    attribute_state_value_11:
+        attribute: '@attribute_state'
+        type: 'string'
+        value: 'B'
+        public: true
+    attribute_state_value_12:
+        attribute: '@attribute_state'
+        type: 'string'
+        value: 'TB'
+        public: true
+    attribute_state_value_13:
+        attribute: '@attribute_state'
+        type: 'string'
+        value: 'TTB'
+        public: true
+    attribute_state_value_14:
+        attribute: '@attribute_state'
+        type: 'string'
+        value: 'FDC'
+        public: true

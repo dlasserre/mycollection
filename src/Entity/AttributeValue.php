@@ -33,4 +33,9 @@ class AttributeValue
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     public bool $public = false;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+    }
 }

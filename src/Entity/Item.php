@@ -148,4 +148,15 @@ class Item
         }
         return $this;
     }
+
+    public function addCollection(Collection $collection): Item
+    {
+        if (!$this->collections->contains($collection)) {
+            $collection->addItem($this);
+            $this->createdBy = $collection->user;
+            $this->collections->add($collection);
+        }
+
+        return $this;
+    }
 }

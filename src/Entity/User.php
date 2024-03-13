@@ -57,6 +57,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'createdBy', targetEntity: Attribute::class)]
     public iterable $privateAttributes;
 
+    #[ORM\OneToMany(mappedBy: 'follower', targetEntity: CollectionFollower::class)]
+    public iterable $collectionsFollowed;
+
     #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\Column(type: 'gender')]
     public Gender $gender;
@@ -97,6 +100,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->createdAt = new \DateTime();
         $this->collections = new ArrayCollection();
         $this->items = new ArrayCollection();
+        $this->collectionsFollowed = new ArrayCollection();
         $this->roles[] = Role::USER; // Default role.
     }
 
@@ -123,6 +127,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRoles(array $roles): User
     {
         $this->roles = $roles;
+
+        return $this;
+    }
+
+    public function followCollection(Collection $collection, bool $hidden = false): User
+    {
+        if ($collection->published and !$this->collectionsFollowed->contains($collection)) {
+            $collectionFollower = new CollectionFollower();
+            $collectionFollower->follower = $this;
+            $collectionFollower->collection = $collection;
+            $collectionFollower->hidden = $hidden;
+            $collection->followers->add($collectionFollower);
+            $this->collectionsFollowed->add($collectionFollower);
+        }
 
         return $this;
     }

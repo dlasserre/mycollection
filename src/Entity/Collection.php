@@ -62,19 +62,11 @@ class Collection
      *  https://github.com/dan-on/php-interval-tree
      *  https://github.com/judev/php-intervaltree
      * */
-    #[Groups([
-        'collection:output:ROLE_USER',
-        'collection:input:ROLE_USER',
-    ])]
     #[ORM\ManyToOne(targetEntity: Collection::class, inversedBy: 'children')]
-    public ?Collection $parent = null;
+    private ?Collection $parent = null;
 
-    #[Groups([
-        'collection:output:ROLE_USER',
-        'collection:input:ROLE_USER',
-    ])]
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: Collection::class)]
-    public iterable $children;
+    private iterable $children;
 
     #[Groups([
         'collection:output:ROLE_USER',
@@ -95,6 +87,9 @@ class Collection
 
     #[ORM\OneToMany(mappedBy: 'collection', targetEntity: Resource::class)]
     public iterable $resources;
+
+    #[ORM\OneToMany(mappedBy: 'collection', targetEntity: CollectionFollower::class, cascade: ['persist'])]
+    public iterable $followers;
 
     #[Groups([
         'user:output:ROLE_USER',
@@ -130,6 +125,38 @@ class Collection
         $this->createdAt =  new \DateTime();
         $this->children = new ArrayCollection();
         $this->resources = new ArrayCollection();
+        $this->followers = new ArrayCollection();
+    }
+
+    public function addChildrenCollection(Collection $collection): Collection
+    {
+        if (!$this->children->contains($collection)) {
+            $this->children->add($collection);
+        }
+
+        return $this;
+    }
+
+    #[Groups([
+        'collection:input:ROLE_USER',
+    ])]
+    public function setChildrenCollections(iterable $children): Collection
+    {
+        /** @var Collection $child */
+        foreach ($children as $child) {
+            $child->user = $this->user;
+            $this->addChildrenCollection($child);
+        }
+
+        return $this;
+    }
+
+    #[Groups([
+        'collection:output:ROLE_USER',
+    ])]
+    public function getChildrenCollections(): iterable
+    {
+        return $this->children;
     }
 
     public function addItem(Item $item): Collection
@@ -168,5 +195,29 @@ class Collection
     public function getTotalItems(): int
     {
         return $this->items->count();
+    }
+
+    #[Groups([
+        'collection:input:ROLE_USER',
+    ])]
+    public function setParent(Collection $collection): Collection
+    {
+        $this->user = $collection->user;
+        $this->parent = $collection;
+        return $this;
+    }
+
+    #[Groups([
+        'collection:output:ROLE_USER',
+    ])]
+    public function getParent(): ?Collection
+    {
+        return $this->parent;
+    }
+
+    public function addFollower(User $user, bool $hidden = false): Collection
+    {
+        $user->followCollection($this, $hidden);
+        return $this;
     }
 }

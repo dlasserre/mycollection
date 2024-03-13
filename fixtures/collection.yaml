@@ -1,17 +1,20 @@
 App\Entity\Collection:
     collections_{1..20}:
-        user: '@user_<numberBetween(1, 5)>'
+        user: '@user_<numberBetween(1, 20)>'
         category: '@category_<numberBetween(1, 7)>'
         name: <company()>
         description: <text()>
-        published: 0
+        published: <numberBetween(0, 1)>
         enabled: 1
+        __calls:
+            - addFollower: ['@user_<numberBetween(1, 20)>', '<((bool)rand(0,1))>']
         
     collections_{21..50}:
         category: '@category_<numberBetween(1, 7)>'
-        parent:  '@collections_<numberBetween(1, 20)>'
-        user: 'this->parent->user'
         name: <company()>
         description: <text()>
         published: 0
         enabled: 1
+        __calls:
+            - setParent: ['@collections_<numberBetween(1, 20)>']
+            - addFollower: ['@user_<numberBetween(1, 20)>', '<((bool)rand(0,1))>']

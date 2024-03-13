@@ -1,0 +1,9 @@
+App\Entity\Attribute:
+    attribute_color:
+        name: 'color'
+        description: 'Couleur visuelle'
+        public: true
+    attribute_state:
+        name: 'state'
+        description: 'Etat'
+        public: true
