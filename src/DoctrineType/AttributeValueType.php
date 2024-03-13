@@ -2,15 +2,13 @@
 
 namespace App\DoctrineType;
 
-use App\Entity\AttributeValue;
-
 class AttributeValueType extends AbstractEnumType
 {
     public const NAME = 'attribute_value_type';
 
     public static function getEnumsClass(): string
     {
-        return AttributeValue::class;
+        return \App\Enum\AttributeValueType::class;
     }
 
     public function getColumnType(): string

@@ -1,0 +1,17 @@
+App\Entity\Collection:
+    collections_{1..20}:
+        user: '@user_<numberBetween(1, 5)>'
+        category: '@category_<numberBetween(1, 7)>'
+        name: <company()>
+        description: <text()>
+        published: 0
+        enabled: 1
+        
+    collections_{21..50}:
+        category: '@category_<numberBetween(1, 7)>'
+        parent:  '@collections_<numberBetween(1, 20)>'
+        user: 'this->parent->user'
+        name: <company()>
+        description: <text()>
+        published: 0
+        enabled: 1

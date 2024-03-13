@@ -1,0 +1,23 @@
+App\Entity\Category:
+    category_1:
+        name: 'Card'
+        public: true
+    category_2:
+        name: 'Stamp'
+        public: true
+    category_3:
+        name: 'Coin'
+        public: true
+    category_4:
+        name: 'Ticket'
+        public: true
+    category_5:
+        name: 'Car'
+        public: true
+    category_6:
+        name: 'Cork'
+        public: true
+    category_7:
+        name: 'Pokemon card'
+        parent: '@category_1'
+        public: true

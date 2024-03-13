@@ -66,6 +66,7 @@ class Category
         $this->users = new ArrayCollection();
         $this->children = new ArrayCollection();
         $this->collections = new ArrayCollection();
+        $this->createdAt = new \DateTime();
     }
 
     public function hasUser(User $user): bool
@@ -77,7 +78,7 @@ class Category
     {
         return $this->public;
     }
-    
+
     public function getCollections(): \Doctrine\Common\Collections\Collection
     {
         $criteria = Criteria::create()->andWhere(

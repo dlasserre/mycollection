@@ -29,8 +29,10 @@ abstract class AbstractEnumType extends Type
 
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
-        if (false === enum_exists($this->getEnumsClass())) {
-            throw new \LogicException("This class should be an enum");
+        $enumClass = $this->getEnumsClass();
+        if (false === enum_exists($enumClass)) {
+            throw new \LogicException(
+                sprintf("This class '%s' should be an enum", $this->getEnumsClass()));
         }
 
         return $this::getEnumsClass()::tryFrom($value);
