@@ -60,6 +60,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'follower', targetEntity: CollectionFollower::class)]
     public iterable $collectionsFollowed;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: WishList::class)]
+    public iterable $wishLists;
+
+    #[ORM\ManyToMany(targetEntity: Conversation::class, mappedBy: 'users')]
+    public iterable $conversations;
+
+    #[ORM\OneToMany(mappedBy: 'creator', targetEntity: Conversation::class)]
+    public iterable $myConversations;
+
+    #[ORM\OneToMany(mappedBy: 'sender', targetEntity: Message::class)]
+    public iterable $messages;
+
     #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\Column(type: 'gender')]
     public Gender $gender;
@@ -101,6 +113,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->collections = new ArrayCollection();
         $this->items = new ArrayCollection();
         $this->collectionsFollowed = new ArrayCollection();
+        $this->wishLists = new ArrayCollection();
         $this->roles[] = Role::USER; // Default role.
     }
 

@@ -70,6 +70,9 @@ class Item
     #[ORM\OneToMany(mappedBy: 'item', targetEntity: Resource::class)]
     public ?iterable $resources = null;
 
+    #[ORM\OneToMany(mappedBy: 'item', targetEntity: WishListItem::class)]
+    public iterable $wishes;
+
     #[Groups([
         'item:output:ROLE_USER',
         'collection:input:ROLE_USER',
@@ -114,6 +117,7 @@ class Item
         $this->attachments = new ArrayCollection();
         $this->resources = new ArrayCollection();
         $this->prices = new ArrayCollection();
+        $this->wishes = new ArrayCollection();
     }
 
     public function isBuyable(): bool
