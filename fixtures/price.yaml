@@ -1,0 +1,4 @@
+App\Entity\Price:
+    price_{1..20}:
+        price: '<numberBetween(100, 5000)>'
+        crossedPrice: '<numberBetween(5000, 15000)>'

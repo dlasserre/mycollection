@@ -1,0 +1,4 @@
+App\Entity\Conversation:
+    conversation_{1..19}:
+        title: '@user_<current()>->firstname x @user_<($current+1)>->firstname'
+        users: [ '@user_<current()>', '@user_<($current+1)>' ]

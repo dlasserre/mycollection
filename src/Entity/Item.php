@@ -103,8 +103,9 @@ class Item
     #[Groups([
         'collection:output:ROLE_USER',
     ])]
-    #[ORM\OneToMany(mappedBy: 'item', targetEntity: Price::class, cascade: ['persist', 'remove'])]
-    public ?iterable $prices = null;
+    #[ORM\ManyToOne(targetEntity: Price::class, inversedBy: 'items')]
+    #[ORM\JoinColumn(nullable: true)]
+    public ?Price $price = null;
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     public bool $public = false;
@@ -116,13 +117,12 @@ class Item
         $this->attributes = new ArrayCollection();
         $this->attachments = new ArrayCollection();
         $this->resources = new ArrayCollection();
-        $this->prices = new ArrayCollection();
         $this->wishes = new ArrayCollection();
     }
 
     public function isBuyable(): bool
     {
-        return $this->prices->count();
+        return $this->price instanceof Price;
     }
 
     public function isPublic(): bool
@@ -130,26 +130,13 @@ class Item
         return $this->public;
     }
 
-    public function addPrice(Price $price): Item
-    {
-        if (!$this->prices->contains($price)) {
-            $price->item = $this;
-            $this->prices->add($price);
-        }
-
-        return $this;
-    }
-
     #[Groups([
         'collection:input:ROLE_USER',
         'item:input:ROLE_USER',
     ])]
-    public function setPrices(iterable $prices): Item
+    public function setPrices(Price $price): Item
     {
-        /** @var Price $price */
-        foreach ($prices as $price) {
-            $this->addPrice($price);
-        }
+        $this->price = $price;
         return $this;
     }
 

@@ -5,7 +5,7 @@ App\Entity\User:
         firstname: '<firstname()>'
         lastname: '<lastname()>'
         email: '<email()>'
-        password: ""
+        password: '<password()>'
         plainPassword: "test"
         birthdayDate: '<dateTimeBetween("-50 years", "-20 years")>'
         roles: '[ROLE_USER]'

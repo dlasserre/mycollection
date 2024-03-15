@@ -1,0 +1,6 @@
+App\Entity\WishListItem:
+    wishlist_item_{1..50}:
+        wishList: '@wishlist_<numberBetween(0, 10)>'
+        public: '<((bool)rand(0,1))>'
+        item: '@item_<numberBetween(1, 200)>'
+        price: '@price_<numberBetween(1, 20)>'

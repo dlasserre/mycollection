@@ -1,4 +1,6 @@
 App\Entity\WishList:
-    wishList_{0..10}:
+    wishlist_{0..10}:
         user: '@user_<numberBetween(1, 20)>'
         public: '<numberBetween(0, 1)>'
+        __calls:
+            -   addItem: [ '@wishlist_item_<numberBetween(1, 50)>' ]

@@ -17,10 +17,10 @@ class WishListItem
     #[ManyToOne(targetEntity: Item::class, inversedBy: 'wishes')]
     public Item $item;
 
-    #[ORM\OneToOne(targetEntity: Price::class)]
+    #[ORM\ManyToOne(targetEntity: Price::class)]
     #[ORM\JoinColumn(nullable: true)]
     public ?Price $price = null;
-    
+
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     public bool $public;
 

@@ -1,0 +1,3 @@
+App\Entity\Message:
+    message_{1..100}:
+        conversation: '@conversation_<()>'

@@ -13,8 +13,8 @@ class Price
     use IdTrait;
     use DateTrait;
 
-    #[ORM\ManyToOne(targetEntity: Item::class, inversedBy: 'prices')]
-    public Item $item;
+    #[ORM\OneToMany(mappedBy: 'price', targetEntity: Item::class)]
+    public iterable $items;
 
     #[Groups([
         'item:output:ROLE_USER',

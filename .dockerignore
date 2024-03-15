@@ -14,7 +14,7 @@
 **/docker-compose.*.yaml
 **/docker-compose.*.yml
 **/docker-compose.yaml
-**/docker-compose.yml
+docker-compose.yaml
 **/Dockerfile
 **/Thumbs.db
 .github/
