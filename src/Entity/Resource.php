@@ -7,6 +7,8 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\JoinColumn;
@@ -34,6 +36,9 @@ class Resource
 {
     use IdTrait;
     use DateTrait;
+
+    #[ORM\OneToMany(mappedBy: 'resource', targetEntity: Reaction::class)]
+    public iterable $reactions;
 
     #[ManyToOne(targetEntity: Collection::class, inversedBy: 'resources')]
     #[JoinColumn(nullable: true)]
@@ -73,5 +78,6 @@ class Resource
     public function __construct()
     {
         $this->createdAt = new \DateTime();
+        $this->reactions = new ArrayCollection();
     }
 }

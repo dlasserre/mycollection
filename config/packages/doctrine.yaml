@@ -5,6 +5,7 @@ doctrine:
             gender: App\DoctrineType\GenderType
             attachment_type: App\DoctrineType\AttachmentType
             attribute_value_type: App\DoctrineType\AttributeValueType
+            reaction: App\DoctrineType\ReactionType
 
         profiling_collect_backtrace: '%kernel.debug%'
     orm:

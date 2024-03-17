@@ -72,6 +72,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'sender', targetEntity: Message::class)]
     public iterable $messages;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Reaction::class)]
+    public iterable $reactions;
+
     #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\Column(type: 'gender')]
     public Gender $gender;
@@ -114,6 +117,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->items = new ArrayCollection();
         $this->collectionsFollowed = new ArrayCollection();
         $this->wishLists = new ArrayCollection();
+        $this->reactions = new ArrayCollection();
         $this->roles[] = Role::USER; // Default role.
     }
 
@@ -146,7 +150,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function followCollection(Collection $collection, bool $hidden = false): User
     {
-        if ($collection->published and !$this->collectionsFollowed->contains($collection)) {
+        if ($collection->public and !$this->collectionsFollowed->contains($collection)) {
             $collectionFollower = new CollectionFollower();
             $collectionFollower->follower = $this;
             $collectionFollower->collection = $collection;
@@ -177,7 +181,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getImageProfilePath(): ?string
     {
         if ($this->profileImage instanceof Image) {
-            return '/public/uploads/images/'.$this->profileImage->filePath;
+            return '/public/uploads/images/' . $this->profileImage->filePath;
         }
         return null;
     }

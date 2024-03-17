@@ -11,7 +11,7 @@ trait DateTrait
     private \DateTime $createdAt;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTime $updateAt = null;
+    private ?\DateTime $updatedAt = null;
 
     #[Groups(['always'])]
     public function getCreatedAt(): \DateTime
@@ -20,13 +20,13 @@ trait DateTrait
     }
 
     #[Groups(['always'])]
-    public function getUpdateAt(): ?\DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
-        return $this->updateAt;
+        return $this->updatedAt;
     }
 
-    public function setUpdateAt(): void
+    public function setUpdatedAt(): void
     {
-        $this->updateAt = new \DateTime();
+        $this->updatedAt = new \DateTime();
     }
 }

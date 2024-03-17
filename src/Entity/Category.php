@@ -25,7 +25,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
     new Post(
         security: 'is_granted("ROLE_USER")'
     )
-    ],
+],
     normalizationContext: ['groups' => ['category']],
     denormalizationContext: ['groups' => ['category']],
 )]
@@ -74,7 +74,7 @@ class Category
         return $this->users->contains($user);
     }
 
-    public function isPublic():bool
+    public function isPublic(): bool
     {
         return $this->public;
     }
@@ -83,7 +83,7 @@ class Category
     {
         $criteria = Criteria::create()->andWhere(
             Criteria::expr()->andX(
-                Criteria::expr()->eq('published', 1),
+                Criteria::expr()->eq('public', 1),
                 Criteria::expr()->eq('enabled', 1)
             )
         );
@@ -95,7 +95,7 @@ class Category
         'category:output:ROLE_USER',
     ])]
     #[SerializedName('totalPublicCollections')]
-    public function getTotalCollections():int
+    public function getTotalCollections(): int
     {
         return $this->getCollections()->count();
     }

@@ -17,9 +17,9 @@ class CollectionRepository extends AbstractRepository
     {
         $query = $this->createQueryBuilder('c');
         if (!$user->isAdmin()) {
-            $query->join('c.user', 'u');
+            $query->join('c.user', 'user');
         }
-        $query->where($query->expr()->orX('c.published = true', 'c.published = false and c.user = :user'))
+        $query->where($query->expr()->orX('c.public = true', 'c.public = false and c.user = :user'))
             ->setParameter(':user', $user);
 
         return $query;

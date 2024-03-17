@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\ManyToOne;
 
@@ -10,6 +11,9 @@ class WishListItem
 {
     use IdTrait;
     use DateTrait;
+
+    #[ORM\OneToMany(mappedBy: 'wishListItem', targetEntity: Reaction::class)]
+    public iterable $reactions;
 
     #[ManyToOne(targetEntity: WishList::class, inversedBy: 'items')]
     public WishList $wishList;
@@ -27,5 +31,6 @@ class WishListItem
     public function __construct()
     {
         $this->createdAt = new \DateTime();
+        $this->reactions = new ArrayCollection();
     }
 }

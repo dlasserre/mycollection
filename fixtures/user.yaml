@@ -8,4 +8,4 @@ App\Entity\User:
         password: '<password()>'
         plainPassword: "test"
         birthdayDate: '<dateTimeBetween("-50 years", "-20 years")>'
-        roles: '[ROLE_USER]'
+        roles: '["ROLE_USER"]'

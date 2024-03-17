@@ -2,13 +2,21 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Common\Filter\DateFilterInterface;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Filter\UserFilter;
 use App\Processor\ItemProcessor;
+use App\Provider\CollectionItemProvider;
+use App\Repository\ItemRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -17,6 +25,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     operations: [
         new GetCollection(
             security: 'is_granted("ROLE_USER")',
+            provider: CollectionItemProvider::class
         ),
         new Get(
             security: 'is_granted("ROLE_USER")',
@@ -33,9 +42,23 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
     ],
     normalizationContext: ['groups' => ['item']],
-    denormalizationContext: ['groups' => ['item']]
+    denormalizationContext: ['groups' => ['item']],
+    filters: [
+        UserFilter::class
+    ]
 )]
-#[ORM\Entity]
+#[ApiFilter(SearchFilter::class, properties: [
+    'title' => 'partial',
+    'description' => 'partial',
+])]
+#[ApiFilter(RangeFilter::class, properties: [
+    'price.price'
+])]
+#[ApiFilter(DateFilter::class, strategy: DateFilterInterface::EXCLUDE_NULL, properties: [
+    'createdAt',
+    'updatedAt'
+])]
+#[ORM\Entity(repositoryClass: ItemRepository::class)]
 class Item
 {
     use DateTrait;
@@ -73,6 +96,9 @@ class Item
     #[ORM\OneToMany(mappedBy: 'item', targetEntity: WishListItem::class)]
     public iterable $wishes;
 
+    #[ORM\OneToMany(mappedBy: 'item', targetEntity: Reaction::class)]
+    public iterable $reactions;
+
     #[Groups([
         'item:output:ROLE_USER',
         'collection:input:ROLE_USER',
@@ -102,6 +128,8 @@ class Item
 
     #[Groups([
         'collection:output:ROLE_USER',
+        'item:output:ROLE_USER',
+        'item:input:ROLE_USER',
     ])]
     #[ORM\ManyToOne(targetEntity: Price::class, inversedBy: 'items')]
     #[ORM\JoinColumn(nullable: true)]
@@ -118,6 +146,7 @@ class Item
         $this->attachments = new ArrayCollection();
         $this->resources = new ArrayCollection();
         $this->wishes = new ArrayCollection();
+        $this->reactions = new ArrayCollection();
     }
 
     public function isBuyable(): bool

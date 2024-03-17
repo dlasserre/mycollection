@@ -39,6 +39,14 @@ services:
             - !tagged api_platform.doctrine.orm.query_extension.collection
             - '@api_platform.iri_converter'
         tags: [ 'api_platform.state_provider' ]
+
+    App\Provider\CollectionItemProvider:
+        arguments:
+            - '@security.helper'
+            - '@doctrine'
+            - !tagged api_platform.doctrine.orm.query_extension.collection
+            - '@api_platform.iri_converter'
+        tags: [ 'api_platform.state_provider' ]
     
     App\Provider\CategoryProvider:
         arguments:
@@ -47,43 +55,43 @@ services:
             - !tagged api_platform.doctrine.orm.query_extension.collection
             - '@api_platform.iri_converter'
         tags: [ 'api_platform.state_provider' ]
-        
+
     App\Processor\CollectionProcessor:
         arguments:
             - '@security.helper'
             - '@doctrine'
             - '@api_platform.iri_converter'
         tags: [ 'api_platform.state_processor' ]
-        
+
     App\Processor\ItemProcessor:
         arguments:
             - '@security.helper'
             - '@doctrine'
             - '@api_platform.iri_converter'
         tags: [ 'api_platform.state_processor' ]
-        
+
     App\EventListener\ExceptionListener:
         tags:
             - { name: 'kernel.event_listener', event: 'kernel.exception' }
-                
+
     App\EventListener\DoctrineListener\UpdateDateListener:
         tags:
             -   name: 'doctrine.orm.entity_listener'
                 event: 'preUpdate'
                 entity: 'App\Entity\Resource'
-                
+
             -   name: 'doctrine.orm.entity_listener'
                 event: 'preUpdate'
                 entity: 'App\Entity\Collection'
-                
+
             -   name: 'doctrine.orm.entity_listener'
                 event: 'preUpdate'
                 entity: 'App\Entity\Item'
-                
+
             -   name: 'doctrine.orm.entity_listener'
                 event: 'preUpdate'
                 entity: 'App\Entity\Price'
-                
+
             -   name: 'doctrine.orm.entity_listener'
                 event: 'preUpdate'
                 entity: 'App\Entity\Category'
@@ -95,3 +103,9 @@ services:
             -   name: 'doctrine.orm.entity_listener'
                 event: 'prePersist'
                 entity: 'App\Entity\User'
+
+    App\Filter\UserFilter:
+        arguments:
+            - '@doctrine'
+            - '@monolog.logger'
+        tags: [ 'api_platform.filter' ]
