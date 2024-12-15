@@ -109,3 +109,10 @@ services:
             - '@doctrine'
             - '@monolog.logger'
         tags: [ 'api_platform.filter' ]
+
+
+    App\EventSubscriber\MeSubscriber:
+        arguments:
+            - '@security.helper'
+            - '@router.default'
+        tags: [ kernel.event_subscriber ]

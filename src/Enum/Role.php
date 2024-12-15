@@ -2,28 +2,11 @@
 
 namespace App\Enum;
 
-enum Role
+enum Role: string
 {
-    case SUPER_ADMIN;
-    case ADMIN;
-
-    case USER;
-
-    case ANONYMOUS;
-
-    public function role(string $entity): string
-    {
-        return $entity . ':' . $this->getRoleName();
-    }
-
-    public function getRoleName(): string
-    {
-        return match ($this) {
-            self::SUPER_ADMIN => 'ROLE_SUPER_ADMIN',
-            self::ADMIN => 'ROLE_ADMIN',
-            self::USER => 'USER',
-            default => 'ANONYMOUS',
-        };
-    }
-
+    use BaseEnumTrait;
+    case SUPER_ADMIN = 'ROLE_SUPER_ADMIN';
+    case ADMIN = 'ROLE_ADMIN';
+    case USER = 'USER';
+    case ANONYMOUS = 'ANONYMOUS';
 }

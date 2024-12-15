@@ -27,7 +27,7 @@ final readonly class GenericContextBuilder implements SerializerContextBuilderIn
 
         if (array_key_exists('groups', $context)) {
             $roles = (null !== $user) ?
-                $this->hierarchy->getReachableRoleNames($user->getRoles()) : [Role::ANONYMOUS->getRoleName()];
+                $this->hierarchy->getReachableRoleNames($user->getRoles()) : [Role::ANONYMOUS];
             $context['groups'] = $this->getGroups($normalization, $context, $roles);
         }
         return $context;

@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -12,6 +14,7 @@ use App\Enum\Gender;
 use App\Enum\Role;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -36,44 +39,49 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
             security: 'is_granted("ROLE_ADMIN")'
         )
     ],
+    normalizationContext: ['groups' => ['user:output:ROLE_USER']],
+    denormalizationContext: ['groups' => ['user:input:ROLE_USER']]
 )]
+#[ApiFilter(SearchFilter::class, properties: [
+    'email' => 'partial',
+    'firstname' => 'partial',
+    'lastname' => 'partial'
+])]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use DateTrait;
     use IdTrait;
 
-    #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Collection::class)]
-    public iterable $collections;
+    public \Doctrine\Common\Collections\Collection $collections;
 
-    #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\OneToMany(mappedBy: 'createdBy', targetEntity: Item::class)]
-    public iterable $items;
+    public \Doctrine\Common\Collections\Collection $items;
 
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'users')]
-    public iterable $privateCategories;
+    public \Doctrine\Common\Collections\Collection $privateCategories;
 
     #[ORM\OneToMany(mappedBy: 'createdBy', targetEntity: Attribute::class)]
-    public iterable $privateAttributes;
+    public \Doctrine\Common\Collections\Collection $privateAttributes;
 
     #[ORM\OneToMany(mappedBy: 'follower', targetEntity: CollectionFollower::class)]
-    public iterable $collectionsFollowed;
+    public \Doctrine\Common\Collections\Collection $collectionsFollowed;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: WishList::class)]
-    public iterable $wishLists;
+    public \Doctrine\Common\Collections\Collection $wishLists;
 
     #[ORM\ManyToMany(targetEntity: Conversation::class, mappedBy: 'users')]
-    public iterable $conversations;
+    public \Doctrine\Common\Collections\Collection $conversations;
 
     #[ORM\OneToMany(mappedBy: 'creator', targetEntity: Conversation::class)]
-    public iterable $myConversations;
+    public \Doctrine\Common\Collections\Collection $myConversations;
 
     #[ORM\OneToMany(mappedBy: 'sender', targetEntity: Message::class)]
-    public iterable $messages;
+    public \Doctrine\Common\Collections\Collection $messages;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Reaction::class)]
-    public iterable $reactions;
+    public \Doctrine\Common\Collections\Collection $reactions;
 
     #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\Column(type: 'gender')]
@@ -105,7 +113,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'json', nullable: false)]
     public array $roles;
 
-    #[Groups(['user:output:ROLE__USER', 'user:input:ROLE_USER'])]
+    #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\OneToOne(targetEntity: Image::class)]
     #[ORM\JoinColumn(nullable: true)]
     public ?Image $profileImage = null;
@@ -121,7 +129,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->roles[] = Role::USER; // Default role.
     }
 
-    public function getFullname(): string
+    public function getFullName(): string
     {
         return $this->lastname . ' ' . $this->firstname;
     }
@@ -174,7 +182,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function isAdmin(): bool
     {
-        return in_array(Role::ADMIN->getRoleName(), $this->roles);
+        return in_array(Role::ADMIN, $this->roles);
     }
 
     #[SerializedName('imageProfilePath')]
@@ -184,5 +192,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             return '/public/uploads/images/' . $this->profileImage->filePath;
         }
         return null;
+    }
+
+    #[Groups(['user:output:ROLE_USER'])]
+    public function getCollections(): \Doctrine\Common\Collections\Collection
+    {
+        return $this->collections->matching(
+            Criteria::create()->andWhere(Criteria::expr()->eq('enabled', true))
+        );
+    }
+
+    #[Groups(['user:output:ROLE_USER'])]
+    public function getTotalCollections(): int
+    {
+        return $this->collections->count();
+    }
+
+    #[Groups(['user:output:ROLE_USER'])]
+    public function getTotalItems(): int
+    {
+        return $this->items->count();
     }
 }

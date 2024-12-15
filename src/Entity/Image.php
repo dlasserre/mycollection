@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Post;
 use App\Controller\CreateImageObjectAction;
 use App\Enum\AttachmentType;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ApiResource(operations: [
@@ -34,11 +35,10 @@ class Image
     #[Vich\UploadableField(mapping: 'image', fileNameProperty: 'filePath')]
     public mixed $file;
 
+    #[Groups('user:output:ROLE_USER')]
     #[ORM\Column(nullable: true)]
     public mixed $filePath;
 
     #[ORM\Column(type: 'attachment_type', nullable: false)]
     public AttachmentType $type;
-
-
 }

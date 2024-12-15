@@ -9,8 +9,10 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Enum\Role;
 use App\Filter\UserFilter;
 use App\Processor\CollectionProcessor;
 use App\Provider\CollectionProvider;
@@ -18,7 +20,10 @@ use App\Repository\CollectionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Serializer\Annotation\Context;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
@@ -41,7 +46,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Delete(
             security: 'is_granted("ROLE_ADMIN") or is_granted("ROLE_USER") and user.hasCollection(object)',
             processor: CollectionProcessor::class
-        )
+        ),
     ],
     normalizationContext: ['groups' => ['collection']],
     denormalizationContext: ['groups' => ['collection']],
@@ -54,23 +59,42 @@ use Symfony\Component\Validator\Constraints as Assert;
     'public'
 ])]
 #[ApiFilter(SearchFilter::class, properties: [
-    'name' => 'partial'
+    'name' => 'partial',
+    'category.name' => 'exact'
 ])]
 class Collection
 {
     use DateTrait;
     use IdTrait;
 
-    /**
-     * @todo refactor : https://perso.univ-lemans.fr/~cpiau/BD/SQL_PAGES/SQL13.htm
-     *  https://github.com/dan-on/php-interval-tree
-     *  https://github.com/judev/php-intervaltree
-     * */
+    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: Collection::class)]
+    private \Doctrine\Common\Collections\Collection $children;
+
+    #[ORM\ManyToMany(targetEntity: Item::class, inversedBy: 'collections')]
+    private \Doctrine\Common\Collections\Collection $items;
+
+    #[Groups([
+        'collection:output:ROLE_USER',
+        'collection:input:ROLE_USER',
+    ])]
+    #[ORM\OneToMany(mappedBy: 'collection', targetEntity: Attachment::class)]
+    public \Doctrine\Common\Collections\Collection $attachments;
+
+    #[ORM\OneToMany(mappedBy: 'collection', targetEntity: Resource::class)]
+    public \Doctrine\Common\Collections\Collection $resources;
+
+    #[ORM\OneToMany(mappedBy: 'collection', targetEntity: CollectionFollower::class, cascade: ['persist'])]
+    public \Doctrine\Common\Collections\Collection $followers;
+
+    #[ORM\OneToMany(mappedBy: 'collection', targetEntity: Reaction::class)]
+    public \Doctrine\Common\Collections\Collection $reactions;
+
     #[ORM\ManyToOne(targetEntity: Collection::class, inversedBy: 'children')]
     private ?Collection $parent = null;
 
-    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: Collection::class)]
-    private iterable $children;
+    #[ORM\OneToOne(targetEntity: Image::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    public ?Image $image = null;
 
     #[Groups([
         'collection:output:ROLE_USER',
@@ -78,25 +102,6 @@ class Collection
     ])]
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'collections')]
     public Category $category;
-
-    #[ORM\ManyToMany(targetEntity: Item::class, inversedBy: 'collections')]
-    private iterable $items;
-
-    #[Groups([
-        'collection:output:ROLE_USER',
-        'collection:input:ROLE_USER',
-    ])]
-    #[ORM\OneToMany(mappedBy: 'collection', targetEntity: Attachment::class)]
-    public iterable $attachments;
-
-    #[ORM\OneToMany(mappedBy: 'collection', targetEntity: Resource::class)]
-    public iterable $resources;
-
-    #[ORM\OneToMany(mappedBy: 'collection', targetEntity: CollectionFollower::class, cascade: ['persist'])]
-    public iterable $followers;
-
-    #[ORM\OneToMany(mappedBy: 'collection', targetEntity: Reaction::class)]
-    public iterable $reactions;
 
     #[Groups([
         'user:output:ROLE_USER',
@@ -203,10 +208,37 @@ class Collection
 
     #[Groups([
         'collection:output:ROLE_USER',
+        'user:output:ROLE_USER',
     ])]
+    #[Context(['security' => 'is_granted("ROLE_USER") && user != object.user'])]
+    #[SerializedName('totalItems')]
+    public function getTotalPublicItems(): int
+    {
+        return $this->items->matching(
+            Criteria::create()->andWhere(Criteria::expr()->eq('public', true))
+        )->count();
+    }
+
+    #[Groups([
+        'collection:output:ROLE_USER',
+        'user:output:ROLE_USER',
+    ])]
+    #[Context(['security' => 'is_granted("ROLE_USER") && user == object.user'])]
     public function getTotalItems(): int
     {
         return $this->items->count();
+    }
+
+    #[Groups([
+        'collection:output:ROLE_USER',
+        'user:output:ROLE_USER',
+    ])]
+    #[Context(['security' => 'is_granted("ROLE_USER") && user == object.user'])]
+    public function getTotalPrivateItems(): int
+    {
+        return $this->items->matching(
+            Criteria::create()->andWhere(Criteria::expr()->eq('public', false))
+        )->count();
     }
 
     #[Groups([
@@ -233,8 +265,53 @@ class Collection
         return $this;
     }
 
+    #[Groups([
+        'collection:output:ROLE_USER',
+        'user:output:ROLE_USER',
+    ])]
+    public function getTotalFollowers():int
+    {
+        return $this->followers->count();
+    }
+
+    #[Groups([
+        'collection:output:ROLE_USER',
+        'user:output:ROLE_USER',
+    ])]
+    public function getTotalLikes(): int
+    {
+        return $this->reactions->matching(
+            Criteria::create()->andWhere(Criteria::expr()->eq('type', \App\Enum\Reaction::LIKE))
+        )->count();
+    }
+
+    #[Groups([
+        'collection:output:ROLE_USER',
+        'user:output:ROLE_USER',
+    ])]
     public function isPublic(): bool
     {
         return $this->public;
+    }
+
+    #[Groups([
+        'collection:output:ROLE_USER',
+        'user:output:ROLE_USER',
+    ])]
+    public function getType(): string
+    {
+        return $this->category?->parent->name ?? $this->category->name;
+    }
+
+    #[Groups(['collection:output:ROLE_USER', 'user:output:ROLE_USER'])]
+    public function getImage(): ?Image
+    {
+        return $this->image;
+    }
+
+    #[Groups(['user:output:ROLE_USER'])]
+    public function getShortDescription(): string
+    {
+            return substr($this->description, 0, 100).'...';
     }
 }

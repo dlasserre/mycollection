@@ -11,13 +11,12 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[UniqueEntity('follower', 'collection')]
 class CollectionFollower
 {
+    use IdTrait;
     use DateTrait;
 
-    #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'collectionsFollowed')]
     public User $follower;
 
-    #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Collection::class, inversedBy: 'followers')]
     public Collection $collection;
 
