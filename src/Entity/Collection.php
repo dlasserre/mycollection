@@ -119,6 +119,10 @@ class Collection
     #[Orm\ManyToOne(targetEntity: User::class, inversedBy: 'collections')]
     public User $user;
 
+    #[Groups([
+        'collection:output:ROLE_USER',
+        'collection:input:ROLE_USER',
+    ])]
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     public bool $public;
 

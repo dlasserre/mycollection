@@ -8,7 +8,6 @@ final readonly class ExceptionListener
 {
     public function onKernelException(ExceptionEvent $event): void
     {
-        $exception = $event->getThrowable();
-        dd($exception->getMessage(), $exception->getFile(), $exception->getLine());
+        dd($event->getThrowable()->getMessage());
     }
 }

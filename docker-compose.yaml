@@ -1,5 +1,4 @@
-name: 'my_collection'
-version: '3.8'
+name: 'mycollection'
 
 services:
     php:

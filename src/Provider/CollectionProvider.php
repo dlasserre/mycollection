@@ -25,7 +25,7 @@ class CollectionProvider extends AbstractProvider
     {
         /** @var CollectionRepository $repository */
         $repository = $this->getRepository(Collection::class);
-
+        
         return $this->applyCollectionExtension(
             $repository->getCollections($this->getUser()),
             $operation,

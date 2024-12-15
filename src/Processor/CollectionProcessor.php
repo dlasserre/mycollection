@@ -30,7 +30,7 @@ class CollectionProcessor extends AbstractProcessor
      */
     public function post(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Collection
     {
-        if ($data->parent instanceof Collection and $data->parent->user !== $this->getUser()) {
+        if ($data->getParent() instanceof Collection and $data->getParent()->user !== $this->getUser()) {
             throw new UnauthorizedHttpException('', 'Your not allowed to use this parent collection');
         }
         $data->user = $this->getUser();

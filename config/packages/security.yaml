@@ -11,7 +11,9 @@ security:
                 class: 'App\Entity\User'
                 property: 'email'
     firewalls:
+
         login:
+            host: 'api.mycollection.localhost'
             entry_point: jwt
             stateless: true
             lazy: true
