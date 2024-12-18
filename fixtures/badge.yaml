@@ -1,0 +1,13 @@
+App\Entity\Badge:
+  badge_1:
+    name: 'Gold'
+    color: '#F0E68C'
+    description: 'Gold badge'
+  badge_2:
+    name: 'Silver'
+    color: '#C0C0C0'
+    description: 'Silver badge'
+  badge_3:
+    name: 'Bronze'
+    color: '#614e1a'
+    description: 'Bronze badge'

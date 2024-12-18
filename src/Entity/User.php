@@ -53,6 +53,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     use DateTrait;
     use IdTrait;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserBadge::class)]
+    public \Doctrine\Common\Collections\Collection $userBadges;
+
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Collection::class)]
     public \Doctrine\Common\Collections\Collection $collections;
 
@@ -212,5 +215,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getTotalItems(): int
     {
         return $this->items->count();
+    }
+
+    #[Groups(['user:output:ROLE_USER'])]
+    public function getBadges(): \Doctrine\Common\Collections\Collection
+    {
+        $badges = new ArrayCollection();
+        /** @var UserBadge $userBadge */
+        foreach ($this->userBadges as $userBadge) {
+            $badges->add($userBadge->badge);
+        }
+        return $badges;
     }
 }

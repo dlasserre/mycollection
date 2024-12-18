@@ -56,6 +56,14 @@ services:
             - '@api_platform.iri_converter'
         tags: [ 'api_platform.state_provider' ]
 
+    App\Provider\BadgeProvider:
+        arguments:
+            - '@security.helper'
+            - '@doctrine'
+            - !tagged api_platform.doctrine.orm.query_extension.collection
+            - '@api_platform.iri_converter'
+        tags: [ 'api_platform.state_provider' ]
+
     App\Processor\CollectionProcessor:
         arguments:
             - '@security.helper'
