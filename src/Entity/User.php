@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Controller\UserRegisterController;
 use App\Enum\Gender;
 use App\Enum\Role;
 use App\Repository\UserRepository;

@@ -78,9 +78,9 @@ services:
             - '@api_platform.iri_converter'
         tags: [ 'api_platform.state_processor' ]
 
-    App\EventListener\ExceptionListener:
-        tags:
-            - { name: 'kernel.event_listener', event: 'kernel.exception' }
+#    App\EventListener\ExceptionListener:
+#        tags:
+#            - { name: 'kernel.event_listener', event: 'kernel.exception' }
 
     App\EventListener\DoctrineListener\UpdateDateListener:
         tags:
