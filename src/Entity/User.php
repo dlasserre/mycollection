@@ -10,9 +10,9 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use App\Controller\UserRegisterController;
 use App\Enum\Gender;
 use App\Enum\Role;
+use App\Processor\UserRegisterProcessor;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ApiResource(
     operations: [
@@ -29,6 +30,11 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
         ),
         new Get(
             security: 'is_granted("ROLE_ADMIN") || user === object',
+        ),
+        new Post(
+            uriTemplate: '/register',
+            security: 'is_granted("PUBLIC_ACCESS")',
+            processor: UserRegisterProcessor::class,
         ),
         new Post(
             security: 'is_granted("ROLE_ADMIN")'
@@ -93,14 +99,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\Column(type: 'string')]
+    #[NotBlank]
     public string $firstname;
 
     #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\Column(type: 'string')]
+    #[NotBlank]
     public string $lastname;
 
     #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\Column(type: 'string')]
+    #[NotBlank]
     public string $email;
 
     #[Groups(['user:input:ROLE_USER'])]
@@ -143,6 +152,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->roles;
     }
 
+    public function setRoles(array $roles): User
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
     public function eraseCredentials(): void
     {
         $this->plainPassword = null;
@@ -151,13 +167,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUserIdentifier(): string
     {
         return $this->email;
-    }
-
-    public function setRoles(array $roles): User
-    {
-        $this->roles = $roles;
-
-        return $this;
     }
 
     public function followCollection(Collection $collection, bool $hidden = false): User

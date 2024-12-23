@@ -1,41 +1,42 @@
 security:
-    enable_authenticator_manager: true
-    
-    password_hashers:
-        App\Entity\User:
-            algorithm: 'argon2i'
+  enable_authenticator_manager: true
 
-    providers:
-        app_user_provider:
-            entity:
-                class: 'App\Entity\User'
-                property: 'email'
-    firewalls:
+  password_hashers:
+    App\Entity\User:
+      algorithm: 'argon2i'
 
-        login:
-            host: 'api.mycollection.localhost'
-            entry_point: jwt
-            stateless: true
-            lazy: true
-            switch_user: { role: 'ROLE_SUPER_ADMIN' }
-            provider: app_user_provider
-            json_login:
-                check_path: /authentication
-                username_path: email
-                password_path: password
-                success_handler: lexik_jwt_authentication.handler.authentication_success
-                failure_handler: lexik_jwt_authentication.handler.authentication_failure
-            refresh_jwt:
-                check_path: /api/token/refresh
-            jwt: ~
-    
-    role_hierarchy:
-        ROLE_USER: PUBLIC_ACCESS
-        ROLE_ADMIN: ROLE_USER
-        ROLE_ALLOWED_TO_SWITCH: ROLE_ADMIN
-        ROLE_SUPER_ADMIN: ROLE_ALLOWED_TO_SWITCH
-        
-    access_control:
-        - { path: ^/authentication, role: PUBLIC_ACCESS }
-        - { path: ^/users/register, role: PUBLIC_ACCESS }
-        - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
+  providers:
+    app_user_provider:
+      entity:
+        class: 'App\Entity\User'
+        property: 'email'
+  firewalls:
+
+    login:
+      host: 'api.mycollection.localhost'
+      entry_point: jwt
+      stateless: true
+      lazy: true
+      switch_user: { role: 'ROLE_SUPER_ADMIN' }
+      provider: app_user_provider
+      json_login:
+        check_path: /authentication
+        username_path: email
+        password_path: password
+        success_handler: lexik_jwt_authentication.handler.authentication_success
+        failure_handler: lexik_jwt_authentication.handler.authentication_failure
+      refresh_jwt:
+        check_path: /api/token/refresh
+      jwt: ~
+
+  role_hierarchy:
+    ROLE_USER: PUBLIC_ACCESS
+    ROLE_ADMIN: ROLE_USER
+    ROLE_ALLOWED_TO_SWITCH: ROLE_ADMIN
+    ROLE_SUPER_ADMIN: ROLE_ALLOWED_TO_SWITCH
+
+  access_control:
+    - { path: ^/authentication, role: PUBLIC_ACCESS }
+    - { path: ^/register, role: PUBLIC_ACCESS }
+    - { path: ^/users/register, role: PUBLIC_ACCESS }
+    - { path: ^/, roles: IS_AUTHENTICATED_FULLY }

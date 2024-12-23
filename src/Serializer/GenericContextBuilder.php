@@ -43,6 +43,7 @@ final readonly class GenericContextBuilder implements SerializerContextBuilderIn
         ];
         foreach ($context['groups'] as $group) {
             array_push($groups, [$group], [$group, $norm]);
+            /** @var Role $role */
             foreach ($roles as $role) {
                 array_push(
                     $groups,
