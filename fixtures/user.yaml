@@ -1,11 +1,11 @@
 App\Entity\User:
-    user_{1..20}:
-        id: '<current()>'
-        gender: !php/const App\Enum\Gender::MALE
-        firstname: '<firstname()>'
-        lastname: '<lastname()>'
-        email: '<email()>'
-        password: '<password()>'
-        plainPassword: "test"
-        birthdayDate: '<dateTimeBetween("-50 years", "-20 years")>'
-        roles: '["ROLE_USER"]'
+  user_{1..20}:
+    id: '<current()>'
+    gender: !php/const App\Enum\Gender::MALE
+    firstname: '<firstname()>'
+    lastname: '<lastname()>'
+    email: '<email()>'
+    password: '<password()>'
+    plainPassword: "test"
+    birthdayDate: '<dateTimeBetween("-50 years", "-20 years")>'
+    roles: [ "ROLE_USER" ]

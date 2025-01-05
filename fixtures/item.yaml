@@ -1,9 +1,9 @@
 App\Entity\Item:
-    item_{1..200}:
-        createdBy: '@user_<numberBetween(1, 20)>'
-        title: <firstname()>
-        description: <text()>
-        public: '<((bool)rand(0,1))>'
-        price: '@price_<numberBetween(1, 20)>'
-        __calls:
-            -   addCollection: [ '@collections_<numberBetween(1, 50)>' ]
+  item_{1..200}:
+    createdBy: '@user_<numberBetween(1, 20)>'
+    title: <firstname()>
+    description: <text()>
+    public: '<((bool)rand(0,1))>'
+    price: '@price_<numberBetween(1, 20)>'
+    __calls:
+      - addCollection: [ '@collections_<numberBetween(1, 20)>' ]
