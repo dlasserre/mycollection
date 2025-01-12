@@ -20,6 +20,6 @@ App\Entity\Collection:
       Une passion partagée à travers cette collection exclusive.,
       Des objets rares, témoins d’un passé révolu.])>
     public: <numberBetween(0, 1)> # Définit si la collection est publique (0 ou 1)
-    enabled: 1 # Active par défaut la collection
+    enabled: <boolean()> # Active par défaut la collection
     __calls:
       - addFollower: [ '@user_<numberBetween(1, 20)>', '<((bool)rand(0,1))>' ]

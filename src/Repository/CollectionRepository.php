@@ -19,8 +19,10 @@ class CollectionRepository extends AbstractRepository
         if (!$user->isAdmin()) {
             $query->join('c.user', 'user');
         }
-        $query->where($query->expr()->orX('c.public = true', 'c.public = false and c.user = :user'))
-            ->setParameter(':user', $user);
+        $query
+            ->where(
+                $query->expr()->orX('c.public = false and c.user = :user', 'c.public = true')
+            )->setParameter(':user', $user);
 
         return $query;
     }

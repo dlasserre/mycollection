@@ -1,23 +1,90 @@
 App\Entity\Category:
-    category_1:
-        name: 'Card'
-        public: true
-    category_2:
-        name: 'Stamp'
-        public: true
-    category_3:
-        name: 'Coin'
-        public: true
-    category_4:
-        name: 'Ticket'
-        public: true
-    category_5:
-        name: 'Car'
-        public: true
-    category_6:
-        name: 'Cork'
-        public: true
-    category_7:
-        name: 'Pokemon card'
-        parent: '@category_1'
-        public: true
+  category_1:
+    name: 'Card'
+    public: true
+    icon: 'icon-card'
+  category_1_1:
+    name: 'Trading Card'
+    parent: '@category_1'
+    public: true
+    icon: 'icon-card'
+  category_1_2:
+    name: 'Collectible Card'
+    parent: '@category_1'
+    public: true
+    icon: 'icon-card'
+  category_2:
+    name: 'Stamp'
+    public: true
+    icon: 'icon-stamp'
+  category_2_1:
+    name: 'Rare Stamp'
+    parent: '@category_2'
+    public: true
+    icon: 'icon-stamp'
+  category_2_2:
+    name: 'Commemorative Stamp'
+    parent: '@category_2'
+    public: true
+    icon: 'icon-stamp'
+  category_3:
+    name: 'Coin'
+    public: true
+    icon: 'icon-coin'
+  category_3_1:
+    name: 'Gold Coin'
+    parent: '@category_3'
+    public: true
+    icon: 'icon-coin'
+  category_3_2:
+    name: 'Silver Coin'
+    parent: '@category_3'
+    public: true
+    icon: 'icon-coin'
+  category_4:
+    name: 'Ticket'
+    public: true
+    icon: 'icon-ticket'
+  category_4_1:
+    name: 'Concert Ticket'
+    parent: '@category_4'
+    public: true
+    icon: 'icon-ticket'
+  category_4_2:
+    name: 'Event Ticket'
+    parent: '@category_4'
+    public: true
+    icon: 'icon-ticket'
+  category_5:
+    name: 'Car'
+    public: true
+    icon: 'icon-car'
+  category_5_1:
+    name: 'Luxury Car'
+    parent: '@category_5'
+    public: true
+    icon: 'icon-car'
+  category_5_2:
+    name: 'Sports Car'
+    parent: '@category_5'
+    public: true
+    icon: 'icon-car'
+  category_6:
+    name: 'Cork'
+    public: true
+    icon: 'icon-cork'
+  category_6_1:
+    name: 'Wine Cork'
+    parent: '@category_6'
+    public: true
+    icon: 'icon-cork'
+  category_6_2:
+    name: 'Beer Cork'
+    parent: '@category_6'
+    public: true
+    icon: 'icon-cork'
+  category_7:
+    name: 'Pokemon card'
+    parent: '@category_1'
+    public: true
+    icon: 'icon-card'

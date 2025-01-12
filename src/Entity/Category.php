@@ -26,7 +26,10 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
         security: 'is_granted("ROLE_USER")'
     )
 ],
-    normalizationContext: ['groups' => ['category']],
+    normalizationContext: [
+        'groups' => ['category'],
+        'skip_null_values' => false,
+    ],
     denormalizationContext: ['groups' => ['category']],
 )]
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
@@ -47,9 +50,6 @@ class Category
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'privateCategories')]
     public iterable $users;
 
-    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Collection::class)]
-    private iterable $collections;
-
     #[Groups([
         'collection:output:ROLE_USER',
         'category:output:ROLE_USER',
@@ -60,6 +60,15 @@ class Category
     #[ORM\Column(type: 'boolean')]
     public bool $public = false;
 
+    #[Groups([
+        'collection:output:ROLE_USER',
+        'category:output:ROLE_USER',
+    ])]
+    #[ORM\Column(type: 'string')]
+    public string $icon;
+
+    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Collection::class)]
+    private iterable $collections;
 
     public function __construct()
     {
@@ -79,6 +88,16 @@ class Category
         return $this->public;
     }
 
+    #[Groups([
+        'collection:output:ROLE_USER',
+        'category:output:ROLE_USER',
+    ])]
+    #[SerializedName('totalPublicCollections')]
+    public function getTotalCollections(): int
+    {
+        return $this->getCollections()->count();
+    }
+
     public function getCollections(): \Doctrine\Common\Collections\Collection
     {
         $criteria = Criteria::create()->andWhere(
@@ -88,15 +107,5 @@ class Category
             )
         );
         return $this->collections->matching($criteria);
-    }
-
-    #[Groups([
-        'collection:output:ROLE_USER',
-        'category:output:ROLE_USER',
-    ])]
-    #[SerializedName('totalPublicCollections')]
-    public function getTotalCollections(): int
-    {
-        return $this->getCollections()->count();
     }
 }
