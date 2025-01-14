@@ -49,7 +49,8 @@ use Symfony\Component\Validator\Constraints as Assert;
     denormalizationContext: ['groups' => ['collection']],
     filters: [
         UserFilter::class
-    ]
+    ],
+    paginationClientItemsPerPage: true
 )]
 #[ORM\Entity(repositoryClass: CollectionRepository::class)]
 #[ApiFilter(BooleanFilter::class, properties: [
@@ -57,18 +58,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 ])]
 #[ApiFilter(SearchFilter::class, properties: [
     'name' => 'partial',
-    'category.name' => 'exact'
+    'category.name' => 'exact',
+    'user' => 'exact',
 ])]
 class Collection
 {
     use DateTrait;
     use IdTrait;
-
-    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: Collection::class)]
-    private \Doctrine\Common\Collections\Collection $children;
-
-    #[ORM\ManyToMany(targetEntity: Item::class, inversedBy: 'collections')]
-    private \Doctrine\Common\Collections\Collection $items;
 
     #[Groups([
         'collection:output:ROLE_USER',
@@ -76,30 +72,21 @@ class Collection
     ])]
     #[ORM\OneToMany(mappedBy: 'collection', targetEntity: Attachment::class)]
     public \Doctrine\Common\Collections\Collection $attachments;
-
     #[ORM\OneToMany(mappedBy: 'collection', targetEntity: Resource::class)]
     public \Doctrine\Common\Collections\Collection $resources;
-
     #[ORM\OneToMany(mappedBy: 'collection', targetEntity: CollectionFollower::class, cascade: ['persist'])]
     public \Doctrine\Common\Collections\Collection $followers;
-
     #[ORM\OneToMany(mappedBy: 'collection', targetEntity: Reaction::class)]
     public \Doctrine\Common\Collections\Collection $reactions;
-
-    #[ORM\ManyToOne(targetEntity: Collection::class, inversedBy: 'children')]
-    private ?Collection $parent = null;
-
     #[ORM\OneToOne(targetEntity: Image::class)]
     #[ORM\JoinColumn(nullable: true)]
     public ?Image $image = null;
-
     #[Groups([
         'collection:output:ROLE_USER',
         'collection:input:ROLE_USER',
     ])]
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'collections')]
     public Category $category;
-
     #[Groups([
         'user:output:ROLE_USER',
         'item:output:ROLE_USER',
@@ -110,26 +97,28 @@ class Collection
     #[ORM\Column(type: 'string')]
     #[Assert\NotBlank()]
     public string $name;
-
     #[Groups([
         'collection:output:ROLE_USER',
         'collection:input:ROLE_USER',
     ])]
     #[ORM\Column(type: 'text', nullable: true)]
     public ?string $description = null;
-
     #[Orm\ManyToOne(targetEntity: User::class, inversedBy: 'collections')]
     public User $user;
-
     #[Groups([
         'collection:output:ROLE_USER',
         'collection:input:ROLE_USER',
     ])]
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     public bool $public;
-
     #[ORM\Column(type: 'boolean', options: ['default' => true])]
     public bool $enabled = true;
+    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: Collection::class)]
+    private \Doctrine\Common\Collections\Collection $children;
+    #[ORM\ManyToMany(targetEntity: Item::class, inversedBy: 'collections')]
+    private \Doctrine\Common\Collections\Collection $items;
+    #[ORM\ManyToOne(targetEntity: Collection::class, inversedBy: 'children')]
+    private ?Collection $parent = null;
 
     public function __construct()
     {
@@ -140,15 +129,6 @@ class Collection
         $this->resources = new ArrayCollection();
         $this->followers = new ArrayCollection();
         $this->reactions = new ArrayCollection();
-    }
-
-    public function addChildrenCollection(Collection $collection): Collection
-    {
-        if (!$this->children->contains($collection)) {
-            $this->children->add($collection);
-        }
-
-        return $this;
     }
 
     #[Groups([
@@ -165,6 +145,15 @@ class Collection
         return $this;
     }
 
+    public function addChildrenCollection(Collection $collection): Collection
+    {
+        if (!$this->children->contains($collection)) {
+            $this->children->add($collection);
+        }
+
+        return $this;
+    }
+
     #[Groups([
         'collection:output:ROLE_USER',
     ])]
@@ -173,12 +162,15 @@ class Collection
         return $this->children;
     }
 
-    public function addItem(Item $item): Collection
+    #[Groups([
+        'collection:output:ROLE_USER',
+    ])]
+    public function getItems(): iterable
     {
-        if (!$this->items->contains($item)) {
-            $this->items->add($item);
-        }
-        return $this;
+        $criteria = Criteria::create()
+            ->andWhere(Criteria::expr()->eq('public', true))
+            ->setMaxResults(10);
+        return $this->items->matching($criteria);
     }
 
     #[Groups([
@@ -192,15 +184,12 @@ class Collection
         return $this;
     }
 
-    #[Groups([
-        'collection:output:ROLE_USER',
-    ])]
-    public function getItems(): iterable
+    public function addItem(Item $item): Collection
     {
-        $criteria = Criteria::create()
-            ->andWhere(Criteria::expr()->eq('public', true))
-            ->setMaxResults(10);
-        return $this->items->matching($criteria);
+        if (!$this->items->contains($item)) {
+            $this->items->add($item);
+        }
+        return $this;
     }
 
     #[Groups([
@@ -239,6 +228,14 @@ class Collection
     }
 
     #[Groups([
+        'collection:output:ROLE_USER',
+    ])]
+    public function getParent(): ?Collection
+    {
+        return $this->parent;
+    }
+
+    #[Groups([
         'collection:input:ROLE_USER',
     ])]
     public function setParent(Collection $collection): Collection
@@ -246,14 +243,6 @@ class Collection
         $this->user = $collection->user;
         $this->parent = $collection;
         return $this;
-    }
-
-    #[Groups([
-        'collection:output:ROLE_USER',
-    ])]
-    public function getParent(): ?Collection
-    {
-        return $this->parent;
     }
 
     public function addFollower(User $user, bool $hidden = false): Collection
@@ -266,7 +255,7 @@ class Collection
         'collection:output:ROLE_USER',
         'user:output:ROLE_USER',
     ])]
-    public function getTotalFollowers():int
+    public function getTotalFollowers(): int
     {
         return $this->followers->count();
     }
@@ -309,6 +298,6 @@ class Collection
     #[Groups(['user:output:ROLE_USER'])]
     public function getShortDescription(): string
     {
-            return substr($this->description, 0, 100).'...';
+        return substr($this->description, 0, 100) . '...';
     }
 }
