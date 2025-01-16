@@ -36,21 +36,24 @@ class Badge
 
     #[Groups([
         'badge:output:ROLE_USER',
-        'user:output:ROLE_USER'
+        'user:output:ROLE_USER',
+        'collection:output:ROLE_USER'
     ])]
     #[ORM\Column(nullable: false)]
     public string $name;
 
     #[Groups([
         'badge:output:PUBLIC_ACCESS',
-        'user:output:ROLE_USER'
+        'user:output:ROLE_USER',
+        'collection:output:ROLE_USER'
     ])]
     #[ORM\Column(nullable: false)]
     public string $color;
 
     #[Groups([
         'badge:output:PUBLIC_ACCESS',
-        'user:output:ROLE_USER'
+        'user:output:ROLE_USER',
+        'collection:output:ROLE_USER'
     ])]
     #[ORM\Column(nullable: true)]
     public ?string $description;

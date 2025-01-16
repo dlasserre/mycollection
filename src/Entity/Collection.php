@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -18,7 +19,6 @@ use App\Repository\CollectionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Context;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -72,21 +72,27 @@ class Collection
     ])]
     #[ORM\OneToMany(mappedBy: 'collection', targetEntity: Attachment::class)]
     public \Doctrine\Common\Collections\Collection $attachments;
+
     #[ORM\OneToMany(mappedBy: 'collection', targetEntity: Resource::class)]
     public \Doctrine\Common\Collections\Collection $resources;
+
     #[ORM\OneToMany(mappedBy: 'collection', targetEntity: CollectionFollower::class, cascade: ['persist'])]
     public \Doctrine\Common\Collections\Collection $followers;
+
     #[ORM\OneToMany(mappedBy: 'collection', targetEntity: Reaction::class)]
     public \Doctrine\Common\Collections\Collection $reactions;
+
     #[ORM\OneToOne(targetEntity: Image::class)]
     #[ORM\JoinColumn(nullable: true)]
     public ?Image $image = null;
+
     #[Groups([
         'collection:output:ROLE_USER',
         'collection:input:ROLE_USER',
     ])]
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'collections')]
     public Category $category;
+
     #[Groups([
         'user:output:ROLE_USER',
         'item:output:ROLE_USER',
@@ -97,26 +103,30 @@ class Collection
     #[ORM\Column(type: 'string')]
     #[Assert\NotBlank()]
     public string $name;
+
     #[Groups([
         'collection:output:ROLE_USER',
         'collection:input:ROLE_USER',
     ])]
     #[ORM\Column(type: 'text', nullable: true)]
     public ?string $description = null;
+
     #[Orm\ManyToOne(targetEntity: User::class, inversedBy: 'collections')]
     public User $user;
-    #[Groups([
-        'collection:output:ROLE_USER',
-        'collection:input:ROLE_USER',
-    ])]
+
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     public bool $public;
+
     #[ORM\Column(type: 'boolean', options: ['default' => true])]
+    #[ApiProperty(security: "is_granted('ROLE_USER') && user == object.user")]
     public bool $enabled = true;
+
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: Collection::class)]
     private \Doctrine\Common\Collections\Collection $children;
+
     #[ORM\ManyToMany(targetEntity: Item::class, inversedBy: 'collections')]
     private \Doctrine\Common\Collections\Collection $items;
+
     #[ORM\ManyToOne(targetEntity: Collection::class, inversedBy: 'children')]
     private ?Collection $parent = null;
 
@@ -196,7 +206,17 @@ class Collection
         'collection:output:ROLE_USER',
         'user:output:ROLE_USER',
     ])]
-    #[Context(['security' => 'is_granted("ROLE_USER") && user != object.user'])]
+    #[ApiProperty(security: "is_granted('ROLE_USER') && user == object.user")]
+    public function getTotalItems(): int
+    {
+        return $this->items->count();
+    }
+
+    #[Groups([
+        'collection:output:ROLE_USER',
+        'user:output:ROLE_USER',
+    ])]
+    #[ApiProperty(security: "is_granted('ROLE_USER') && user == object.user")]
     #[SerializedName('totalItems')]
     public function getTotalPublicItems(): int
     {
@@ -209,17 +229,7 @@ class Collection
         'collection:output:ROLE_USER',
         'user:output:ROLE_USER',
     ])]
-    #[Context(['security' => 'is_granted("ROLE_USER") && user == object.user'])]
-    public function getTotalItems(): int
-    {
-        return $this->items->count();
-    }
-
-    #[Groups([
-        'collection:output:ROLE_USER',
-        'user:output:ROLE_USER',
-    ])]
-    #[Context(['security' => 'is_granted("ROLE_USER") && user == object.user'])]
+    #[ApiProperty(security: "is_granted('ROLE_USER') && user == object.user")]
     public function getTotalPrivateItems(): int
     {
         return $this->items->matching(
@@ -275,6 +285,7 @@ class Collection
         'collection:output:ROLE_USER',
         'user:output:ROLE_USER',
     ])]
+    #[ApiProperty(security: "is_granted('ROLE_USER') && user == object.user")]
     public function isPublic(): bool
     {
         return $this->public;
@@ -299,5 +310,11 @@ class Collection
     public function getShortDescription(): string
     {
         return substr($this->description, 0, 100) . '...';
+    }
+
+    #[Groups(['collection:output:ROLE_USER'])]
+    public function getUser(): User
+    {
+        return $this->user;
     }
 }

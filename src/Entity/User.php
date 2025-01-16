@@ -46,8 +46,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
             security: 'is_granted("ROLE_ADMIN")'
         )
     ],
-    normalizationContext: ['groups' => ['user:output:ROLE_USER']],
-    denormalizationContext: ['groups' => ['user:input:ROLE_USER']]
+    normalizationContext: ['groups' => ['user']],
+    denormalizationContext: ['groups' => ['user']]
 )]
 #[ApiFilter(SearchFilter::class, properties: [
     'email' => 'partial',
@@ -60,76 +60,65 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     use DateTrait;
     use IdTrait;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserBadge::class)]
-    public \Doctrine\Common\Collections\Collection $userBadges;
-
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Collection::class)]
-    public \Doctrine\Common\Collections\Collection $collections;
-
-    #[ORM\OneToMany(mappedBy: 'createdBy', targetEntity: Item::class)]
-    public \Doctrine\Common\Collections\Collection $items;
-
-    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'users')]
-    public \Doctrine\Common\Collections\Collection $privateCategories;
-
-    #[ORM\OneToMany(mappedBy: 'createdBy', targetEntity: Attribute::class)]
-    public \Doctrine\Common\Collections\Collection $privateAttributes;
-
-    #[ORM\OneToMany(mappedBy: 'follower', targetEntity: CollectionFollower::class)]
-    public \Doctrine\Common\Collections\Collection $collectionsFollowed;
-
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: WishList::class)]
-    public \Doctrine\Common\Collections\Collection $wishLists;
-
-    #[ORM\ManyToMany(targetEntity: Conversation::class, mappedBy: 'users')]
-    public \Doctrine\Common\Collections\Collection $conversations;
-
-    #[ORM\OneToMany(mappedBy: 'creator', targetEntity: Conversation::class)]
-    public \Doctrine\Common\Collections\Collection $myConversations;
-
-    #[ORM\OneToMany(mappedBy: 'sender', targetEntity: Message::class)]
-    public \Doctrine\Common\Collections\Collection $messages;
-
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Reaction::class)]
-    public \Doctrine\Common\Collections\Collection $reactions;
-
     #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\Column(type: 'gender')]
     public Gender $gender;
-
     #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\Column(type: 'string')]
     #[NotBlank]
     public string $firstname;
-
     #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\Column(type: 'string')]
     #[NotBlank]
     public string $lastname;
-
-    #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\Column(type: 'string')]
     #[NotBlank]
     public string $email;
-
     #[Groups(['user:input:ROLE_USER'])]
     public ?string $plainPassword = null;
-
     #[ORM\Column(type: 'string')]
     public string $password;
-
     #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
+    #[ORM\OneToMany(mappedBy: 'createdBy', targetEntity: Item::class)]
+    private \Doctrine\Common\Collections\Collection $items;
+    #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
+    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'users')]
+    private \Doctrine\Common\Collections\Collection $privateCategories;
+    #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
+    #[ORM\OneToMany(mappedBy: 'createdBy', targetEntity: Attribute::class)]
+    private \Doctrine\Common\Collections\Collection $privateAttributes;
+    #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
+    #[ORM\OneToMany(mappedBy: 'follower', targetEntity: CollectionFollower::class)]
+    private \Doctrine\Common\Collections\Collection $collectionsFollowed;
+    #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: WishList::class)]
+    private \Doctrine\Common\Collections\Collection $wishLists;
+    #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
+    #[ORM\ManyToMany(targetEntity: Conversation::class, mappedBy: 'users')]
+    private \Doctrine\Common\Collections\Collection $conversations;
+    #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
+    #[ORM\OneToMany(mappedBy: 'creator', targetEntity: Conversation::class)]
+    private \Doctrine\Common\Collections\Collection $myConversations;
+    #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
+    #[ORM\OneToMany(mappedBy: 'sender', targetEntity: Message::class)]
+    private \Doctrine\Common\Collections\Collection $messages;
+    #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Reaction::class)]
+    private \Doctrine\Common\Collections\Collection $reactions;
+    #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserBadge::class)]
+    private \Doctrine\Common\Collections\Collection $userBadges;
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Collection::class)]
+    private \Doctrine\Common\Collections\Collection $collections;
     #[ORM\Column(type: 'datetime', nullable: true)]
-    public ?\DateTime $birthdayDate = null;
+    private ?\DateTime $birthdayDate = null;
 
-    #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_SUPER_ADMIN'])]
     #[ORM\Column(type: 'json', nullable: false)]
-    public array $roles;
+    private array $roles;
 
-    #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\OneToOne(targetEntity: Image::class)]
     #[ORM\JoinColumn(nullable: true)]
-    public ?Image $profileImage = null;
+    private ?Image $profileImage = null;
 
     public function __construct()
     {
@@ -142,11 +131,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->roles[] = Role::USER; // Default role.
     }
 
+    #[Groups([
+        'user:output:ROLE_USER',
+        'collection:output:ROLE_USER'
+    ])]
     public function getFullName(): string
     {
         return $this->lastname . ' ' . $this->firstname;
     }
 
+    #[Groups(['user:output:ROLE_USER'])]
     public function getRoles(): array
     {
         return $this->roles;
@@ -164,6 +158,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->plainPassword = null;
     }
 
+    #[Groups(['user:output:ROLE_USER'])]
     public function getUserIdentifier(): string
     {
         return $this->email;
@@ -183,21 +178,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    #[Groups(['user:output:ROLE_USER'])]
     public function getPassword(): ?string
     {
         return $this->password;
     }
 
+    #[Groups(['user:output:ROLE_USER'])]
     public function hasCollection(Collection $collection): bool
     {
         return $this->collections->contains($collection);
     }
 
+    #[Groups(['user:output:ROLE_USER'])]
     public function isAdmin(): bool
     {
         return in_array(Role::ADMIN, $this->roles);
     }
 
+    #[Groups(['user:output:ROLE_USER'])]
     #[SerializedName('imageProfilePath')]
     public function getImageProfilePath(): ?string
     {
@@ -227,7 +226,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->items->count();
     }
 
-    #[Groups(['user:output:ROLE_USER'])]
+    #[Groups([
+        'user:output:ROLE_USER',
+        'collection:output:ROLE_USER',
+    ])]
     public function getBadges(): \Doctrine\Common\Collections\Collection
     {
         $badges = new ArrayCollection();
