@@ -78,6 +78,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public ?string $plainPassword = null;
     #[ORM\Column(type: 'string')]
     public string $password;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: MediaFile::class)]
+    private \Doctrine\Common\Collections\Collection $mediaFiles;
     #[Groups(['user:output:ROLE_USER', 'user:input:ROLE_USER'])]
     #[ORM\OneToMany(mappedBy: 'createdBy', targetEntity: Item::class)]
     private \Doctrine\Common\Collections\Collection $items;

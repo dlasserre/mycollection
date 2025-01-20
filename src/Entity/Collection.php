@@ -285,7 +285,6 @@ class Collection
         'collection:output:ROLE_USER',
         'user:output:ROLE_USER',
     ])]
-    #[ApiProperty(security: "is_granted('ROLE_USER') && user == object.user")]
     public function isPublic(): bool
     {
         return $this->public;

@@ -2,6 +2,7 @@ api_platform:
   title: My Collection
   version: 1.0.0
   formats:
+    multipart: [ 'multipart/form-data' ]
     jsonld: [ 'application/ld+json' ]
   docs_formats:
     jsonld: [ 'application/ld+json' ]

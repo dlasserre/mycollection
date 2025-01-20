@@ -31,7 +31,7 @@
         "symfony/twig-bundle": "6.3.*",
         "symfony/validator": "6.3.*",
         "symfony/yaml": "6.3.*",
-        "vich/uploader-bundle": "^2.3"
+        "vich/uploader-bundle": "^2.5"
     },
     "require-dev": {
         "api-platform/schema-generator": "^5.0",

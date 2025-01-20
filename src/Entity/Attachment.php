@@ -3,13 +3,13 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use App\DoctrineType\AttachmentType;
+use App\Enum\AttachmentType;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ApiResource()]
-#[ORM\Entity()]
+#[ApiResource]
+#[ORM\Entity]
 class Attachment
 {
     use DateTrait;
@@ -43,7 +43,10 @@ class Attachment
     ])]
     #[ORM\ManyToOne(targetEntity: Collection::class, inversedBy: 'attachments')]
     #[ORM\JoinColumn(nullable: true)]
-    public ?Item $collection = null;
+    public ?Collection $collection = null;
+
+    #[ORM\OneToOne(targetEntity: MediaFile::class, cascade: ['persist', 'remove'])]
+    public MediaFile $file;
 
     #[Groups([
         'attachment:output:USER',
